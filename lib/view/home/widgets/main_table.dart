@@ -5,6 +5,7 @@ import 'package:medgis_app/page/bloc/main_state.dart';
 import 'package:medgis_app/utils/services/pateint_service.dart';
 import 'package:medgis_app/view/detail/bloc/detail_cubit.dart';
 import 'package:medgis_app/view/home/bloc/home_cubit.dart';
+import 'package:file_selector/file_selector.dart';
 
 class MainTable extends StatefulWidget {
   final bool initialized;
@@ -155,16 +156,53 @@ class _MainTableState extends State<MainTable> {
     });
   }
 
-  // Fungsi untuk mengekspor data pasien ke PDF
   Future<void> _exportPatientData(
       BuildContext context, PatientWithMedicalRecords patientRecord) async {
-    context.read<HomeCubit>().printSinglePatientAsPdf(patientRecord);
+    final homeCubit = context.read<HomeCubit>();
+    final messenger = ScaffoldMessenger.of(context);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            'Patient ${patientRecord.patient.fullName} PDF exported successfully'),
-      ),
+    final String fileName = '${patientRecord.patient.fullName}.pdf';
+    const XTypeGroup typeGroup = XTypeGroup(
+      label: 'PDF',
+      extensions: ['pdf'],
     );
+
+    final file = await getSaveLocation(
+      suggestedName: fileName,
+      acceptedTypeGroups: [typeGroup],
+    );
+
+    if (file != null) {
+      try {
+        await homeCubit.patientService
+            .printSinglePatientData(patientRecord, file.path);
+
+        if (mounted) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                'Patient ${patientRecord.patient.fullName} PDF exported successfully',
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text('Failed to export PDF: $e'),
+            ),
+          );
+        }
+      }
+    } else {
+      if (mounted) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Export canceled'),
+          ),
+        );
+      }
+    }
   }
 }

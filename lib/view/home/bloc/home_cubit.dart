@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/utils/services/pateint_service.dart';
 import 'package:medgis_app/view/home/bloc/home_state.dart';
@@ -83,15 +81,11 @@ class HomeCubit extends Cubit<HomeState> {
         femalePatients));
   }
 
-  void printSinglePatientAsPdf(PatientWithMedicalRecords patientRecord) async {
+  Future<void> printSinglePatientAsPdf(
+      PatientWithMedicalRecords patientRecord, String filePath) async {
     try {
-      // Misalnya kita simpan ke folder Downloads pengguna
-      final downloadPath =
-          'C:/Users/${Platform.environment['USERNAME']}/Downloads';
+      await patientService.printSinglePatientData(patientRecord, filePath);
 
-      await patientService.printSinglePatientData(patientRecord, downloadPath);
-
-      // Emit state dengan parameter lengkap
       final int totalPatients = _allPatients.length;
       final int malePatients =
           _allPatients.where((p) => p.patient.gender == 'Male').length;

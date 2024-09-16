@@ -54,7 +54,7 @@ class ButtonSection extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Ikon ini akan melakukan export data dari dari pasien baris tersebut ke dalam file pdf yang akan muncul pada folder download/unduhan"),
+            "Ikon ini akan melakukan export data dari dari pasien baris tersebut ke dalam file pdf."),
         const Text(""),
         Text(
           "7. Delete Data Patient/Medical Record",

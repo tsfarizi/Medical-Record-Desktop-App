@@ -13,7 +13,6 @@ class DetailCubit extends Cubit<DetailState> {
   DetailCubit(this.patientDao, this.medicalRecordDao) : super(DetailInitial());
 
   void setPatient(PatientWithMedicalRecords patient) async {
-    // Load medical records for the patient
     final medicalRecords = await medicalRecordDao.getMedicalRecordsByPatient(
       patient.patient.registrationNumber,
     );
@@ -28,7 +27,6 @@ class DetailCubit extends Cubit<DetailState> {
     if (state is DetailLoaded) {
       final patient = (state as DetailLoaded).patient;
 
-      // Membuat salinan baru dari patient dengan nilai yang diubah
       final updatedPatient = patient.patient.copyWith(
         fullName: field == 'Name' ? newValue : patient.patient.fullName,
         birthDate: field == 'Birth Date'
@@ -39,7 +37,6 @@ class DetailCubit extends Cubit<DetailState> {
         gender: field == 'Gender' ? newValue : patient.patient.gender,
       );
 
-      // Menyimpan perubahan ke database
       await patientDao.updatePatient(PatientsCompanion(
         registrationNumber: Value(updatedPatient.registrationNumber),
         fullName: Value(updatedPatient.fullName),
@@ -49,13 +46,12 @@ class DetailCubit extends Cubit<DetailState> {
         gender: Value(updatedPatient.gender),
       ));
 
-      // Mengupdate state dengan pasien yang sudah diperbarui
       final updatedPatientRecord = PatientWithMedicalRecords(
         patient: updatedPatient,
         medicalRecords: patient.medicalRecords,
       );
 
-      emit(DetailLoaded(updatedPatientRecord)); // Emit the updated state
+      emit(DetailLoaded(updatedPatientRecord));
     }
   }
 
@@ -70,7 +66,6 @@ class DetailCubit extends Cubit<DetailState> {
 
     await medicalRecordDao.insertMedicalRecord(newRecord);
 
-    // Reload the patient's medical records
     final patient = (state as DetailLoaded).patient;
     final updatedMedicalRecords = await medicalRecordDao
         .getMedicalRecordsByPatient(patient.patient.registrationNumber);
@@ -80,13 +75,12 @@ class DetailCubit extends Cubit<DetailState> {
       medicalRecords: updatedMedicalRecords,
     );
 
-    emit(DetailLoaded(updatedPatientRecord)); // Emit the updated state
+    emit(DetailLoaded(updatedPatientRecord));
   }
 
   void deleteMedicalRecord(String recordId) async {
     await medicalRecordDao.deleteMedicalRecord(recordId);
 
-    // Reload the patient's medical records
     final patient = (state as DetailLoaded).patient;
     final updatedMedicalRecords = await medicalRecordDao
         .getMedicalRecordsByPatient(patient.patient.registrationNumber);
@@ -96,7 +90,7 @@ class DetailCubit extends Cubit<DetailState> {
       medicalRecords: updatedMedicalRecords,
     );
 
-    emit(DetailLoaded(updatedPatientRecord)); // Emit the updated state
+    emit(DetailLoaded(updatedPatientRecord));
   }
 
   void updateMedicalRecord(String recordId, String therapyAndDiagnosis,
@@ -104,11 +98,9 @@ class DetailCubit extends Cubit<DetailState> {
     if (state is DetailLoaded) {
       final patient = (state as DetailLoaded).patient;
 
-      // Ambil catatan medis yang ingin diperbarui
       final recordToUpdate =
           patient.medicalRecords.firstWhere((record) => record.id == recordId);
 
-      // Buat salinan baru dari catatan medis dengan nilai yang diperbarui
       final updatedRecord = MedicalRecordsCompanion(
         id: Value(recordId),
         patientRegistrationNumber:
@@ -118,20 +110,16 @@ class DetailCubit extends Cubit<DetailState> {
         anamnesaAndExamination: Value(anamnesaAndExamination),
       );
 
-      // Perbarui catatan medis di database
       await medicalRecordDao.updateMedicalRecord(updatedRecord);
 
-      // Muat ulang catatan medis untuk pasien
       final updatedMedicalRecords = await medicalRecordDao
           .getMedicalRecordsByPatient(patient.patient.registrationNumber);
-
-      // Emit state dengan data yang diperbarui
       final updatedPatientRecord = PatientWithMedicalRecords(
         patient: patient.patient,
         medicalRecords: updatedMedicalRecords,
       );
 
-      emit(DetailLoaded(updatedPatientRecord)); // Emit the updated state
+      emit(DetailLoaded(updatedPatientRecord));
     }
   }
 }
