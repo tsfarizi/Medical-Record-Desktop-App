@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:medgis_app/utils/theme/color_scheme.dart';
 
 ThemeData themeData = ThemeData(
+    visualDensity: VisualDensity.adaptivePlatformDensity,
     textTheme: TextTheme(
       headlineLarge: TextStyle(
           color: colorScheme.primary,

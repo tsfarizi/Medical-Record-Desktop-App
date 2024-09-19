@@ -2,11 +2,11 @@ abstract class MainState {}
 
 class HomeViewState extends MainState {}
 
-class AddPatientState extends MainState {}
+class AddPatientViewState extends MainState {}
 
-class DetailPatientState extends MainState {
-  DetailPatientState();
-}
+class DetailPatientViewState extends MainState {}
+
+class QueueViewState extends MainState {}
 
 class MainFailure extends MainState {
   final String message;

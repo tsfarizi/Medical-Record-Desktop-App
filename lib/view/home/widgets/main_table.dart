@@ -65,7 +65,7 @@ class _MainTableState extends State<MainTable> {
               onSelectChanged: (value) {
                 if (value != null && value) {
                   context.read<DetailCubit>().setPatient(patientRecord);
-                  context.read<MainCubit>().setState(DetailPatientState());
+                  context.read<MainCubit>().setState(DetailPatientViewState());
                 }
               },
               cells: [

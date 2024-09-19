@@ -78,7 +78,7 @@ class _HomeViewState extends State<HomeView> {
             ),
             TextButton(
               onPressed: () =>
-                  context.read<MainCubit>().setState(AddPatientState()),
+                  context.read<MainCubit>().setState(AddPatientViewState()),
               child: const Row(
                 children: [
                   Icon(Icons.add_rounded),

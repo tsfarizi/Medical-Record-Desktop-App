@@ -7,7 +7,10 @@ void main() async {
   await windowManager.ensureInitialized();
 
   windowManager.waitUntilReadyToShow().then((_) async {
-    await windowManager.setSize(const Size(1200, 800));
+    const Size initialSize = Size(1200, 800);
+    await windowManager.setSize(initialSize);
+
+    await windowManager.setMinimumSize(initialSize);
 
     await windowManager.setAlignment(Alignment.center);
 

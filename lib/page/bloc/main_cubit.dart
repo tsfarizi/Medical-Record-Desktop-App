@@ -7,7 +7,7 @@ class MainCubit extends Cubit<MainState> {
   final PatientDao patientDao;
   final MedicalRecordDao medicalRecordDao;
 
-  MainCubit(this.patientDao, this.medicalRecordDao) : super(HomeViewState());
+  MainCubit(this.patientDao, this.medicalRecordDao) : super(QueueViewState());
 
   void setState(MainState state) {
     emit(state);
