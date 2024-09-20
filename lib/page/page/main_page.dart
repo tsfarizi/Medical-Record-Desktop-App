@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medgis_app/database.dart';
 import 'package:medgis_app/page/bloc/main_cubit.dart';
 import 'package:medgis_app/page/bloc/main_state.dart';
 import 'package:medgis_app/page/widgets/sidebar.dart';
 import 'package:medgis_app/utils/dao/medical_record_dao.dart';
 import 'package:medgis_app/utils/dao/patients_dao.dart';
-import 'package:medgis_app/utils/services/pateint_service.dart';
+import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/theme/color_scheme.dart';
 import 'package:medgis_app/view/add/bloc/add_bloc.dart';
 import 'package:medgis_app/view/add/view/add_view.dart';
@@ -21,7 +20,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppDatabase database = AppDatabase();
+    const String database = "http://192.168.43.41:2003";
     final PatientDao patientDao = PatientDao(database);
     final MedicalRecordDao medicalRecordDao = MedicalRecordDao(database);
     final PatientService patientService =

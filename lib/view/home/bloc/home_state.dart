@@ -1,4 +1,4 @@
-import 'package:medgis_app/utils/services/pateint_service.dart';
+import 'package:medgis_app/utils/services/patient_service.dart';
 
 abstract class HomeState {}
 

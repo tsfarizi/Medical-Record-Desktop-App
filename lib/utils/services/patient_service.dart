@@ -1,11 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/services.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:medgis_app/database.dart';
 import 'package:medgis_app/utils/dao/medical_record_dao.dart';
 import 'package:medgis_app/utils/dao/patients_dao.dart';
+import 'package:medgis_app/utils/models/patient_model.dart';
+import 'package:medgis_app/utils/models/medical_record_model.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class PatientService {
   final PatientDao patientDao;
@@ -18,8 +18,8 @@ class PatientService {
     final List<PatientWithMedicalRecords> result = [];
 
     for (final patient in patients) {
-      final medicalRecords = await medicalRecordDao
-          .getMedicalRecordsByPatient(patient.registrationNumber);
+      final medicalRecords =
+          await medicalRecordDao.getMedicalRecordsByPatient(patient.id);
       final registered =
           medicalRecords.isNotEmpty ? medicalRecords.first.date : null;
       final lastVisited =
@@ -35,8 +35,8 @@ class PatientService {
     return result;
   }
 
-  Future<void> deletePatient(Patient patient) async {
-    await patientDao.deletePatient(patient.registrationNumber);
+  Future<void> deletePatient(String patientId) async {
+    await patientDao.deletePatient(patientId);
   }
 
   Future<void> printSinglePatientData(

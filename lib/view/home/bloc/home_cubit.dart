@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medgis_app/utils/services/pateint_service.dart';
+import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/view/home/bloc/home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
@@ -58,7 +58,7 @@ class HomeCubit extends Cubit<HomeState> {
     try {
       emit(HomeLoading());
 
-      await patientService.deletePatient(patientRecord.patient);
+      await patientService.deletePatient(patientRecord.patient.id);
 
       _allPatients = await patientService.getAllPatientsWithRecords();
       _emitSuccessState(_allPatients);

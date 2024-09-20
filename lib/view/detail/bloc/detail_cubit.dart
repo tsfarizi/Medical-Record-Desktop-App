@@ -1,9 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:drift/drift.dart';
-import 'package:medgis_app/database.dart';
 import 'package:medgis_app/utils/dao/medical_record_dao.dart';
 import 'package:medgis_app/utils/dao/patients_dao.dart';
-import 'package:medgis_app/utils/services/pateint_service.dart';
+import 'package:medgis_app/utils/models/patient_model.dart';
+import 'package:medgis_app/utils/models/medical_record_model.dart';
+import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/view/detail/bloc/detail_state.dart';
 
 class DetailCubit extends Cubit<DetailState> {
@@ -13,9 +13,8 @@ class DetailCubit extends Cubit<DetailState> {
   DetailCubit(this.patientDao, this.medicalRecordDao) : super(DetailInitial());
 
   void setPatient(PatientWithMedicalRecords patient) async {
-    final medicalRecords = await medicalRecordDao.getMedicalRecordsByPatient(
-      patient.patient.registrationNumber,
-    );
+    final medicalRecords =
+        await medicalRecordDao.getMedicalRecordsByPatient(patient.patient.id);
     final updatedPatient = PatientWithMedicalRecords(
       patient: patient.patient,
       medicalRecords: medicalRecords,
@@ -25,68 +24,69 @@ class DetailCubit extends Cubit<DetailState> {
 
   void updatePatientData(String field, String newValue) async {
     if (state is DetailLoaded) {
-      final patient = (state as DetailLoaded).patient;
+      final patientWithRecords = (state as DetailLoaded).patient;
 
-      final updatedPatient = patient.patient.copyWith(
-        fullName: field == 'Name' ? newValue : patient.patient.fullName,
+      final updatedPatient = patientWithRecords.patient.copyWith(
+        fullName:
+            field == 'Name' ? newValue : patientWithRecords.patient.fullName,
         birthDate: field == 'Birth Date'
             ? DateTime.parse(newValue)
-            : patient.patient.birthDate,
-        phone: field == 'Phone' ? newValue : patient.patient.phone,
-        address: field == 'Address' ? newValue : patient.patient.address,
-        gender: field == 'Gender' ? newValue : patient.patient.gender,
+            : patientWithRecords.patient.birthDate,
+        phone: field == 'Phone' ? newValue : patientWithRecords.patient.phone,
+        address:
+            field == 'Address' ? newValue : patientWithRecords.patient.address,
+        gender:
+            field == 'Gender' ? newValue : patientWithRecords.patient.gender,
       );
 
-      await patientDao.updatePatient(PatientsCompanion(
-        registrationNumber: Value(updatedPatient.registrationNumber),
-        fullName: Value(updatedPatient.fullName),
-        birthDate: Value(updatedPatient.birthDate),
-        phone: Value(updatedPatient.phone),
-        address: Value(updatedPatient.address),
-        gender: Value(updatedPatient.gender),
-      ));
+      await patientDao.updatePatient(updatedPatient);
 
       final updatedPatientRecord = PatientWithMedicalRecords(
         patient: updatedPatient,
-        medicalRecords: patient.medicalRecords,
+        medicalRecords: patientWithRecords.medicalRecords,
       );
 
       emit(DetailLoaded(updatedPatientRecord));
     }
   }
 
-  void addMedicalRecord(String patientRegistrationNumber,
-      String therapyAndDiagnosis, String anamnesaAndExamination) async {
-    final newRecord = MedicalRecordsCompanion(
-      patientRegistrationNumber: Value(patientRegistrationNumber),
-      date: Value(DateTime.now()),
-      therapyAndDiagnosis: Value(therapyAndDiagnosis),
-      anamnesaAndExamination: Value(anamnesaAndExamination),
-    );
+  void addMedicalRecord(String patientId, String therapyAndDiagnosis,
+      String anamnesaAndExamination) async {
+    try {
+      final newRecord = MedicalRecord(
+        id: '', // Atau biarkan kosong jika PocketBase mengenerate ID
+        patientId: patientId,
+        date: DateTime.now(),
+        therapyAndDiagnosis: therapyAndDiagnosis,
+        anamnesaAndExamination: anamnesaAndExamination,
+      );
+      print('Inserting MedicalRecord: ${newRecord.toJson()}'); // Debugging
+      await medicalRecordDao.insertMedicalRecord(newRecord);
 
-    await medicalRecordDao.insertMedicalRecord(newRecord);
+      final updatedMedicalRecords =
+          await medicalRecordDao.getMedicalRecordsByPatient(patientId);
 
-    final patient = (state as DetailLoaded).patient;
-    final updatedMedicalRecords = await medicalRecordDao
-        .getMedicalRecordsByPatient(patient.patient.registrationNumber);
+      final updatedPatientRecord = PatientWithMedicalRecords(
+        patient: (state as DetailLoaded).patient.patient,
+        medicalRecords: updatedMedicalRecords,
+      );
 
-    final updatedPatientRecord = PatientWithMedicalRecords(
-      patient: patient.patient,
-      medicalRecords: updatedMedicalRecords,
-    );
-
-    emit(DetailLoaded(updatedPatientRecord));
+      emit(DetailLoaded(updatedPatientRecord));
+    } catch (e) {
+      print('Error adding MedicalRecord: $e'); // Debugging
+      emit(DetailFailure("Gagal menambahkan rekam medis: ${e.toString()}"));
+    }
   }
 
   void deleteMedicalRecord(String recordId) async {
     await medicalRecordDao.deleteMedicalRecord(recordId);
 
-    final patient = (state as DetailLoaded).patient;
+    final patientWithRecords = (state as DetailLoaded).patient;
     final updatedMedicalRecords = await medicalRecordDao
-        .getMedicalRecordsByPatient(patient.patient.registrationNumber);
+        .getMedicalRecordsByPatient(patientWithRecords.patient.id);
 
     final updatedPatientRecord = PatientWithMedicalRecords(
-      patient: patient.patient,
+      patient: patientWithRecords.patient,
       medicalRecords: updatedMedicalRecords,
     );
 
@@ -96,30 +96,68 @@ class DetailCubit extends Cubit<DetailState> {
   void updateMedicalRecord(String recordId, String therapyAndDiagnosis,
       String anamnesaAndExamination) async {
     if (state is DetailLoaded) {
-      final patient = (state as DetailLoaded).patient;
+      final patientWithRecords = (state as DetailLoaded).patient;
 
-      final recordToUpdate =
-          patient.medicalRecords.firstWhere((record) => record.id == recordId);
+      final recordToUpdate = patientWithRecords.medicalRecords
+          .firstWhere((record) => record.id == recordId);
 
-      final updatedRecord = MedicalRecordsCompanion(
-        id: Value(recordId),
-        patientRegistrationNumber:
-            Value(recordToUpdate.patientRegistrationNumber),
-        date: Value(recordToUpdate.date),
-        therapyAndDiagnosis: Value(therapyAndDiagnosis),
-        anamnesaAndExamination: Value(anamnesaAndExamination),
+      final updatedRecord = recordToUpdate.copyWith(
+        therapyAndDiagnosis: therapyAndDiagnosis,
+        anamnesaAndExamination: anamnesaAndExamination,
       );
 
       await medicalRecordDao.updateMedicalRecord(updatedRecord);
 
       final updatedMedicalRecords = await medicalRecordDao
-          .getMedicalRecordsByPatient(patient.patient.registrationNumber);
+          .getMedicalRecordsByPatient(patientWithRecords.patient.id);
+
       final updatedPatientRecord = PatientWithMedicalRecords(
-        patient: patient.patient,
+        patient: patientWithRecords.patient,
         medicalRecords: updatedMedicalRecords,
       );
 
       emit(DetailLoaded(updatedPatientRecord));
     }
+  }
+}
+
+extension PatientCopyWith on Patient {
+  Patient copyWith({
+    String? id,
+    int? registrationNumber,
+    String? fullName,
+    String? address,
+    String? gender,
+    DateTime? birthDate,
+    String? phone,
+  }) {
+    return Patient(
+      id: id ?? this.id,
+      registrationNumber: registrationNumber ?? this.registrationNumber,
+      fullName: fullName ?? this.fullName,
+      address: address ?? this.address,
+      gender: gender ?? this.gender,
+      birthDate: birthDate ?? this.birthDate,
+      phone: phone ?? this.phone,
+    );
+  }
+}
+
+extension MedicalRecordCopyWith on MedicalRecord {
+  MedicalRecord copyWith({
+    String? id,
+    String? patientId,
+    DateTime? date,
+    String? therapyAndDiagnosis,
+    String? anamnesaAndExamination,
+  }) {
+    return MedicalRecord(
+      id: id ?? this.id,
+      patientId: patientId ?? this.patientId,
+      date: date ?? this.date,
+      therapyAndDiagnosis: therapyAndDiagnosis ?? this.therapyAndDiagnosis,
+      anamnesaAndExamination:
+          anamnesaAndExamination ?? this.anamnesaAndExamination,
+    );
   }
 }

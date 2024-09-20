@@ -25,7 +25,55 @@ class DetailView extends StatelessWidget {
       child: BlocBuilder<DetailCubit, DetailState>(
         builder: (context, state) {
           if (state is DetailLoaded) {
-            final patient = state.patient;
+            final patient = state.patient.patient;
+            final birthDate = patient.birthDate.toLocal();
+            final birthDateString = birthDate.toString().split(' ')[0];
+            final age = _calculateAge(patient.birthDate);
+
+            final detailItems = [
+              {
+                'label': 'Registration Number',
+                'value': patient.registrationNumber.toString(),
+                'editable': false,
+                'field': null,
+                'initialValue': null,
+              },
+              {
+                'label': 'Name',
+                'value': patient.fullName,
+                'editable': true,
+                'field': 'Name',
+                'initialValue': patient.fullName,
+              },
+              {
+                'label': 'Birth Date (age)',
+                'value': '$birthDateString ($age)',
+                'editable': true,
+                'field': 'Birth Date',
+                'initialValue': birthDateString,
+              },
+              {
+                'label': 'Phone',
+                'value': patient.phone,
+                'editable': true,
+                'field': 'Phone',
+                'initialValue': patient.phone,
+              },
+              {
+                'label': 'Address',
+                'value': patient.address,
+                'editable': true,
+                'field': 'Address',
+                'initialValue': patient.address,
+              },
+              {
+                'label': 'Gender',
+                'value': patient.gender,
+                'editable': true,
+                'field': 'Gender',
+                'initialValue': patient.gender,
+              },
+            ];
 
             return Column(
               children: [
@@ -50,76 +98,49 @@ class DetailView extends StatelessWidget {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        buildDetailColumn(
+                      children: detailItems.sublist(0, 3).map((item) {
+                        return buildDetailColumn(
                           context,
-                          label: "Registration Number",
-                          value: patient.patient.registrationNumber,
-                        ),
-                        buildDetailColumn(
-                          context,
-                          label: "Name",
-                          value: patient.patient.fullName,
-                          editable: true,
-                          onEditPressed: () => _editField(
-                              context, "Name", patient.patient.fullName),
-                        ),
-                        buildDetailColumn(
-                          context,
-                          label: "Birth Date (age)",
-                          value:
-                              "${patient.patient.birthDate.toLocal().toString().split(' ')[0]} (${_calculateAge(patient.patient.birthDate)})",
-                          editable: true,
-                          onEditPressed: () => _editField(
-                              context,
-                              "Birth Date",
-                              patient.patient.birthDate
-                                  .toLocal()
-                                  .toString()
-                                  .split(' ')[0]),
-                        ),
-                      ],
+                          label: item['label'] as String,
+                          value: item['value'] as String,
+                          editable: item['editable'] as bool,
+                          onEditPressed: item['editable'] as bool
+                              ? () => _editField(
+                                    context,
+                                    item['field'] as String,
+                                    item['initialValue'] as String,
+                                  )
+                              : null,
+                        );
+                      }).toList(),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.2,
+                      height: MediaQuery.of(context).size.height * 0.1,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        buildDetailColumn(
+                      children: detailItems.sublist(3).map((item) {
+                        return buildDetailColumn(
                           context,
-                          label: "Phone",
-                          value: patient.patient.phone,
-                          editable: true,
-                          onEditPressed: () => _editField(
-                              context, "Phone", patient.patient.phone),
-                        ),
-                        buildDetailColumn(
-                          context,
-                          label: "Address",
-                          value: patient.patient.address,
-                          editable: true,
-                          onEditPressed: () => _editField(
-                              context, "Address", patient.patient.address),
-                        ),
-                        buildDetailColumn(
-                          context,
-                          label: "Gender",
-                          value: patient.patient.gender,
-                          editable: true,
-                          onEditPressed: () => _editField(
-                              context, "Gender", patient.patient.gender),
-                        ),
-                      ],
+                          label: item['label'] as String,
+                          value: item['value'] as String,
+                          editable: item['editable'] as bool,
+                          onEditPressed: item['editable'] as bool
+                              ? () => _editField(
+                                    context,
+                                    item['field'] as String,
+                                    item['initialValue'] as String,
+                                  )
+                              : null,
+                        );
+                      }).toList(),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 const Divider(),
                 const SizedBox(height: 10),
-                MedicalRecordTable(
-                    patientRegistrationNumber:
-                        patient.patient.registrationNumber),
+                MedicalRecordTable(patientId: patient.id),
               ],
             );
           } else {
@@ -223,38 +244,45 @@ class DetailView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Edit Gender'),
-          content: DropdownButtonFormField<String>(
-            value: selectedGender,
-            items: ['Male', 'Female']
-                .map((gender) => DropdownMenuItem(
-                      value: gender,
-                      child: Text(gender),
-                    ))
-                .toList(),
-            onChanged: (newValue) {
-              selectedGender = newValue!;
-            },
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                context
-                    .read<DetailCubit>()
-                    .updatePatientData('Gender', selectedGender);
-                Navigator.of(dialogContext).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('New data successfully saved')),
-                );
-              },
-              child: const Text('Save'),
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (alertContext, setState) {
+            return AlertDialog(
+              title: const Text('Edit Gender'),
+              content: DropdownButtonFormField<String>(
+                value: selectedGender,
+                items: ['Male', 'Female']
+                    .map((gender) => DropdownMenuItem(
+                          value: gender,
+                          child: Text(gender),
+                        ))
+                    .toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedGender = newValue!;
+                  });
+                },
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    context
+                        .read<DetailCubit>()
+                        .updatePatientData('Gender', selectedGender);
+                    Navigator.of(dialogContext).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('New data successfully saved')),
+                    );
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

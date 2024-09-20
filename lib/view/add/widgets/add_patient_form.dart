@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:drift/drift.dart' as drift;
-import 'package:medgis_app/database.dart';
 import 'package:medgis_app/page/bloc/main_state.dart';
+import 'package:medgis_app/utils/models/patient_model.dart';
 import 'package:medgis_app/view/add/bloc/add_bloc.dart';
 import 'package:medgis_app/view/add/bloc/add_state.dart';
 import 'package:medgis_app/page/bloc/main_cubit.dart';
@@ -20,6 +19,7 @@ class AddPatientFormState extends State<AddPatientForm> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController birthDateController = TextEditingController();
 
   final FocusNode fullNameFocusNode = FocusNode();
   final FocusNode addressFocusNode = FocusNode();
@@ -34,6 +34,7 @@ class AddPatientFormState extends State<AddPatientForm> {
     fullNameController.dispose();
     addressController.dispose();
     phoneController.dispose();
+    birthDateController.dispose();
     fullNameFocusNode.dispose();
     addressFocusNode.dispose();
     phoneFocusNode.dispose();
@@ -43,12 +44,14 @@ class AddPatientFormState extends State<AddPatientForm> {
 
   void savePatient() {
     if (formKey.currentState?.validate() ?? false) {
-      final patient = PatientsCompanion(
-        fullName: drift.Value(fullNameController.text),
-        address: drift.Value(addressController.text),
-        gender: drift.Value(selectedGender ?? ''),
-        birthDate: drift.Value(selectedDate ?? DateTime.now()),
-        phone: drift.Value(phoneController.text),
+      final patient = Patient(
+        id: '',
+        registrationNumber: 0,
+        fullName: fullNameController.text,
+        address: addressController.text,
+        gender: selectedGender ?? '',
+        birthDate: selectedDate ?? DateTime.now(),
+        phone: phoneController.text,
       );
 
       context.read<AddCubit>().savePatient(patient);
@@ -65,6 +68,7 @@ class AddPatientFormState extends State<AddPatientForm> {
     if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
+        birthDateController.text = "${selectedDate!.toLocal()}".split(' ')[0];
       });
     }
   }
@@ -153,12 +157,7 @@ class AddPatientFormState extends State<AddPatientForm> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                              controller: TextEditingController(
-                                text: selectedDate == null
-                                    ? ''
-                                    : "${selectedDate!.toLocal()}"
-                                        .split(' ')[0],
-                              ),
+                              controller: birthDateController,
                               decoration: InputDecoration(
                                 labelText: 'Birth Date',
                                 border: OutlineInputBorder(
@@ -167,6 +166,12 @@ class AddPatientFormState extends State<AddPatientForm> {
                               ),
                               onTap: () => selectDate(context),
                               readOnly: true,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please select birth date';
+                                }
+                                return null;
+                              },
                             ),
                           ),
                           IconButton(

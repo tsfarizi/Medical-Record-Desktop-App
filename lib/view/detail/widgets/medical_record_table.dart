@@ -1,14 +1,14 @@
+// MedicalRecordTable.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/view/detail/bloc/detail_cubit.dart';
-import 'package:medgis_app/database.dart';
+import 'package:medgis_app/utils/models/medical_record_model.dart';
 import 'package:medgis_app/view/detail/bloc/detail_state.dart';
 
 class MedicalRecordTable extends StatelessWidget {
-  final String patientRegistrationNumber;
+  final String patientId;
 
-  const MedicalRecordTable(
-      {super.key, required this.patientRegistrationNumber});
+  const MedicalRecordTable({super.key, required this.patientId});
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +130,7 @@ class MedicalRecordTable extends StatelessWidget {
             TextButton(
               onPressed: () {
                 context.read<DetailCubit>().addMedicalRecord(
-                      patientRegistrationNumber,
+                      patientId,
                       therapyController.text,
                       anamnesaController.text,
                     );

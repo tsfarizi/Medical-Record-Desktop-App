@@ -1,39 +1,45 @@
-import 'package:drift/drift.dart';
-import 'package:medgis_app/database.dart';
-import 'package:medgis_app/utils/models/patient_model.dart';
+import 'package:medgis_app/utils/models/medical_record_model.dart';
+import 'package:pocketbase/pocketbase.dart';
 
-part 'medical_record_dao.g.dart';
+class MedicalRecordDao {
+  final PocketBase pb;
 
-@DriftAccessor(tables: [MedicalRecords])
-class MedicalRecordDao extends DatabaseAccessor<AppDatabase>
-    with _$MedicalRecordDaoMixin {
-  final AppDatabase db;
+  MedicalRecordDao(String pocketBaseUrl) : pb = PocketBase(pocketBaseUrl);
 
-  MedicalRecordDao(this.db) : super(db);
+  Future<List<MedicalRecord>> getAllMedicalRecords() async {
+    final records = await pb.collection('medical_record').getFullList();
+    return records
+        .map((record) => MedicalRecord.fromJson(record.toJson()))
+        .toList();
+  }
 
-  Future<List<MedicalRecord>> getAllMedicalRecords() =>
-      select(medicalRecords).get();
-
-  Future<MedicalRecord?> getMedicalRecordById(String id) {
-    return (select(medicalRecords)..where((tbl) => tbl.id.equals(id)))
-        .getSingleOrNull();
+  Future<MedicalRecord?> getMedicalRecordById(String id) async {
+    final record = await pb.collection('medical_record').getOne(id);
+    return MedicalRecord.fromJson(record.toJson());
   }
 
   Future<List<MedicalRecord>> getMedicalRecordsByPatient(
-      String registrationNumber) {
-    return (select(medicalRecords)
-          ..where((tbl) =>
-              tbl.patientRegistrationNumber.equals(registrationNumber)))
-        .get();
+      String patientId) async {
+    final records = await pb.collection('medical_record').getFullList(
+          filter: 'patient_id="$patientId"',
+        );
+    return records
+        .map((record) => MedicalRecord.fromJson(record.toJson()))
+        .toList();
   }
 
-  Future<void> insertMedicalRecord(MedicalRecordsCompanion medicalRecord) =>
-      into(medicalRecords).insert(medicalRecord);
+  Future<void> insertMedicalRecord(MedicalRecord record) async {
+    // Pastikan tidak menyertakan 'id' jika PocketBase menggenerasinya
+    await pb.collection('medical_record').create(body: record.toJson());
+  }
 
-  Future<void> updateMedicalRecord(MedicalRecordsCompanion medicalRecord) =>
-      update(medicalRecords).replace(medicalRecord);
+  Future<void> updateMedicalRecord(MedicalRecord record) async {
+    await pb
+        .collection('medical_record')
+        .update(record.id, body: record.toJson());
+  }
 
-  Future<void> deleteMedicalRecord(String id) {
-    return (delete(medicalRecords)..where((tbl) => tbl.id.equals(id))).go();
+  Future<void> deleteMedicalRecord(String id) async {
+    await pb.collection('medical_record').delete(id);
   }
 }

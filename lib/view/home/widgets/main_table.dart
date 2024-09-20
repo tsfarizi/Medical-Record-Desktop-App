@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/page/bloc/main_cubit.dart';
 import 'package:medgis_app/page/bloc/main_state.dart';
-import 'package:medgis_app/utils/services/pateint_service.dart';
+import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/view/detail/bloc/detail_cubit.dart';
 import 'package:medgis_app/view/home/bloc/home_cubit.dart';
 import 'package:file_selector/file_selector.dart';

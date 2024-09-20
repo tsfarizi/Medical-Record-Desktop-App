@@ -1,42 +1,42 @@
-import 'package:drift/drift.dart';
-import 'package:uuid/uuid.dart';
+class Patient {
+  final String id;
+  final int registrationNumber;
+  final String fullName;
+  final String address;
+  final String gender;
+  final DateTime birthDate;
+  final String phone;
 
-class Patients extends Table {
-  TextColumn get registrationNumber => text()
-      .clientDefault(() => const Uuid().v4())
-      .withLength(min: 1, max: 100)
-      .customConstraint('UNIQUE NOT NULL')
-      .named('registration_number')();
+  Patient({
+    required this.id,
+    required this.registrationNumber,
+    required this.fullName,
+    required this.address,
+    required this.gender,
+    required this.birthDate,
+    required this.phone,
+  });
 
-  TextColumn get fullName =>
-      text().withLength(min: 1, max: 255).named('full_name')();
-  TextColumn get address =>
-      text().withLength(min: 1, max: 300).named('address')();
-  TextColumn get gender => text().withLength(min: 1, max: 10).named('gender')();
-  DateTimeColumn get birthDate => dateTime().named('birth_date')();
-  TextColumn get phone => text().withLength(min: 1, max: 15).named('phone')();
+  factory Patient.fromJson(Map<String, dynamic> json) {
+    return Patient(
+      id: json['id'],
+      registrationNumber: int.parse(json['registration_number'].toString()),
+      fullName: json['full_name'],
+      address: json['address'],
+      gender: json['gender'],
+      birthDate: DateTime.parse(json['birth_date']),
+      phone: json['phone'],
+    );
+  }
 
-  @override
-  Set<Column> get primaryKey => {registrationNumber};
-}
-
-class MedicalRecords extends Table {
-  TextColumn get id => text()
-      .clientDefault(() => const Uuid().v4())
-      .withLength(min: 1, max: 100)
-      .customConstraint('UNIQUE NOT NULL')
-      .named('id')();
-
-  TextColumn get patientRegistrationNumber => text()
-      .customConstraint('REFERENCES patients(registration_number) NOT NULL')
-      .named('patient_registration_number')();
-
-  DateTimeColumn get date =>
-      dateTime().clientDefault(() => DateTime.now()).named('date')();
-  TextColumn get therapyAndDiagnosis => text().named('therapy_and_diagnosis')();
-  TextColumn get anamnesaAndExamination =>
-      text().named('anamnesa_and_examination')();
-
-  @override
-  Set<Column> get primaryKey => {id};
+  Map<String, dynamic> toJson() {
+    return {
+      'registration_number': registrationNumber,
+      'full_name': fullName,
+      'address': address,
+      'gender': gender,
+      'birth_date': birthDate.toIso8601String(),
+      'phone': phone,
+    };
+  }
 }
