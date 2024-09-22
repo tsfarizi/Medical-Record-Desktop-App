@@ -85,7 +85,7 @@ class _HomeViewState extends State<HomeView> {
                   SizedBox(
                     width: 5,
                   ),
-                  Text("Add Patient")
+                  Text("Add New Patient")
                 ],
               ),
             ),

@@ -5,11 +5,12 @@ import 'package:medgis_app/utils/theme/color_scheme.dart';
 ThemeData themeData = ThemeData(
     visualDensity: VisualDensity.adaptivePlatformDensity,
     textTheme: TextTheme(
-      headlineLarge: TextStyle(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 2),
-    ),
+        headlineLarge: TextStyle(
+            color: colorScheme.primary,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2),
+        bodyLarge: TextStyle(
+            color: colorScheme.onSurface, fontWeight: FontWeight.bold)),
     fontFamily: GoogleFonts.poppins().fontFamily,
     iconTheme: IconThemeData(color: colorScheme.secondary),
     iconButtonTheme: IconButtonThemeData(

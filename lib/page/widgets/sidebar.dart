@@ -50,7 +50,23 @@ class _SidebarState extends State<Sidebar> {
                         : Colors.transparent,
                   ),
                 ),
-                child: const Text("Queue"),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        width: 15,
+                        child: _activeSelection == 1
+                            ? const Icon(Icons.arrow_forward_rounded)
+                            : Container()),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    const Icon(Icons.queue_rounded),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text("Queue")
+                  ],
+                ),
               ),
               const SizedBox(
                 height: 20,
@@ -69,7 +85,23 @@ class _SidebarState extends State<Sidebar> {
                         : Colors.transparent,
                   ),
                 ),
-                child: const Text("Database"),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        width: 15,
+                        child: _activeSelection == 2
+                            ? const Icon(Icons.arrow_forward_rounded)
+                            : Container()),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    const Icon(Icons.dashboard_rounded),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text("Dashboard")
+                  ],
+                ),
               ),
             ],
           ),
