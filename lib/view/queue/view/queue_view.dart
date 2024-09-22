@@ -37,11 +37,14 @@ class QueueView extends StatelessWidget {
         ),
         Center(
             child: DataTable(
+          columnSpacing: 30,
           columns: const [
-            DataColumn(label: Text("No")),
-            DataColumn(label: Text("Registraion Number")),
-            DataColumn(label: Text("Name")),
-            DataColumn(label: Text("Blood Pressure"))
+            DataColumn(label: SizedBox(width: 20, child: Text("No"))),
+            DataColumn(
+                label: SizedBox(width: 150, child: Text("Registraion Number"))),
+            DataColumn(label: SizedBox(width: 200, child: Text("Name"))),
+            DataColumn(
+                label: SizedBox(width: 120, child: Text("Blood Pressure")))
           ],
           rows: const [],
         )),

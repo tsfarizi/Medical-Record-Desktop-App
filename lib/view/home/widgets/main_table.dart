@@ -46,16 +46,17 @@ class _MainTableState extends State<MainTable> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: DataTable(
+          columnSpacing: 40,
           showCheckboxColumn: false,
           columns: const [
-            DataColumn(label: Text('No')),
-            DataColumn(label: Text('Birth Date')),
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Phone')),
-            DataColumn(label: Text('Registered')),
-            DataColumn(label: Text('Last Visited')),
-            DataColumn(label: Text('Delete')),
-            DataColumn(label: Text('Export')),
+            DataColumn(label: SizedBox(width: 20, child: Text('No'))),
+            DataColumn(label: SizedBox(width: 80, child: Text('Birth Date'))),
+            DataColumn(label: SizedBox(width: 150, child: Text('Name'))),
+            DataColumn(label: SizedBox(width: 80, child: Text('Phone'))),
+            DataColumn(label: SizedBox(width: 80, child: Text('Registered'))),
+            DataColumn(label: SizedBox(width: 80, child: Text('Last Visited'))),
+            DataColumn(label: SizedBox(width: 50, child: Text('Delete'))),
+            DataColumn(label: SizedBox(width: 50, child: Text('Export'))),
           ],
           rows: widget.patients.asMap().entries.map((entry) {
             int index = entry.key;

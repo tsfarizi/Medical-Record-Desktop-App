@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:medgis_app/page/bloc/main_cubit.dart';
-import 'package:medgis_app/page/bloc/main_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medgis_app/view/add/bloc/add_cubit.dart';
+import 'package:medgis_app/view/add/view/add_view.dart';
 import 'package:medgis_app/view/home/bloc/home_cubit.dart';
 import 'package:medgis_app/view/home/bloc/home_state.dart';
 import 'package:medgis_app/view/home/widgets/chart.dart';
@@ -33,6 +33,26 @@ class _HomeViewState extends State<HomeView> {
 
   void _onSearchChanged() {
     context.read<HomeCubit>().filterPatients(searchController.text);
+  }
+
+  void _showAddPatientDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return BlocProvider.value(
+          value: context.read<HomeCubit>(),
+          child: BlocProvider.value(
+            value: context.read<AddCubit>(),
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: const AddView(),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -77,8 +97,7 @@ class _HomeViewState extends State<HomeView> {
               width: 20,
             ),
             TextButton(
-              onPressed: () =>
-                  context.read<MainCubit>().setState(AddPatientViewState()),
+              onPressed: _showAddPatientDialog,
               child: const Row(
                 children: [
                   Icon(Icons.add_rounded),
