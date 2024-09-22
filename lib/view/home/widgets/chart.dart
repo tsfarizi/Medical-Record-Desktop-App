@@ -40,8 +40,9 @@ class _ChartState extends State<Chart> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: colorScheme.primaryContainer),
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                color: colorScheme.primaryContainer,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -75,29 +76,55 @@ class _ChartState extends State<Chart> {
         SizedBox(
           width: 200,
           height: 200,
-          child: PieChart(
-            PieChartData(
-              sections: _showingSections(malePercentage, femalePercentage),
-              centerSpaceRadius: 40,
-              sectionsSpace: 4,
-              pieTouchData: PieTouchData(
-                touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                  setState(() {
-                    if (!event.isInterestedForInteractions ||
-                        pieTouchResponse == null ||
-                        pieTouchResponse.touchedSection == null) {
-                      touchedIndex = -1;
-                      return;
-                    }
-                    touchedIndex =
-                        pieTouchResponse.touchedSection!.touchedSectionIndex;
-                  });
-                },
-              ),
-              startDegreeOffset: 180,
-              borderData: FlBorderData(show: false),
-            ),
-          ),
+          child: widget.totalPatients > 0
+              ? PieChart(
+                  PieChartData(
+                    sections:
+                        _showingSections(malePercentage, femalePercentage),
+                    centerSpaceRadius: 40,
+                    sectionsSpace: 4,
+                    pieTouchData: PieTouchData(
+                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (!mounted) return;
+                          if (pieTouchResponse == null ||
+                              pieTouchResponse.touchedSection == null ||
+                              widget.totalPatients == 0) {
+                            setState(() {
+                              touchedIndex = -1;
+                            });
+                            return;
+                          }
+
+                          setState(() {
+                            if (!event.isInterestedForInteractions) {
+                              touchedIndex = -1;
+                              return;
+                            }
+                            touchedIndex = pieTouchResponse
+                                .touchedSection!.touchedSectionIndex;
+                          });
+                        });
+                      },
+                    ),
+                    startDegreeOffset: 180,
+                    borderData: FlBorderData(show: false),
+                  ),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "No Data Available",
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                    ),
+                  ),
+                ),
         ),
       ],
     );
@@ -105,6 +132,10 @@ class _ChartState extends State<Chart> {
 
   List<PieChartSectionData> _showingSections(
       double malePercentage, double femalePercentage) {
+    if (widget.totalPatients == 0) {
+      return [];
+    }
+
     return List.generate(2, (i) {
       final isTouched = i == touchedIndex;
       final double fontSize = isTouched ? 25.0 : 16.0;
@@ -142,6 +173,6 @@ class _ChartState extends State<Chart> {
         default:
           throw Error();
       }
-    });
+    }).where((section) => section.value > 0).toList();
   }
 }
