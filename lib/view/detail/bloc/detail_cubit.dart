@@ -54,13 +54,12 @@ class DetailCubit extends Cubit<DetailState> {
       String anamnesaAndExamination) async {
     try {
       final newRecord = MedicalRecord(
-        id: '', // Atau biarkan kosong jika PocketBase mengenerate ID
+        id: '',
         patientId: patientId,
         date: DateTime.now(),
         therapyAndDiagnosis: therapyAndDiagnosis,
         anamnesaAndExamination: anamnesaAndExamination,
       );
-      print('Inserting MedicalRecord: ${newRecord.toJson()}'); // Debugging
       await medicalRecordDao.insertMedicalRecord(newRecord);
 
       final updatedMedicalRecords =
@@ -73,7 +72,6 @@ class DetailCubit extends Cubit<DetailState> {
 
       emit(DetailLoaded(updatedPatientRecord));
     } catch (e) {
-      print('Error adding MedicalRecord: $e'); // Debugging
       emit(DetailFailure("Gagal menambahkan rekam medis: ${e.toString()}"));
     }
   }

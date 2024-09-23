@@ -29,7 +29,6 @@ class MedicalRecordDao {
   }
 
   Future<void> insertMedicalRecord(MedicalRecord record) async {
-    // Pastikan tidak menyertakan 'id' jika PocketBase menggenerasinya
     await pb.collection('medical_record').create(body: record.toJson());
   }
 

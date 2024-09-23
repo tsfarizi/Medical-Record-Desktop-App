@@ -5,6 +5,7 @@ import 'package:medgis_app/page/bloc/main_state.dart';
 import 'package:medgis_app/page/widgets/sidebar.dart';
 import 'package:medgis_app/utils/dao/medical_record_dao.dart';
 import 'package:medgis_app/utils/dao/patients_dao.dart';
+import 'package:medgis_app/utils/dao/queue_dao.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/theme/color_scheme.dart';
 import 'package:medgis_app/view/add/bloc/add_cubit.dart';
@@ -12,6 +13,7 @@ import 'package:medgis_app/view/detail/bloc/detail_cubit.dart';
 import 'package:medgis_app/view/detail/view/detail_view.dart';
 import 'package:medgis_app/view/home/view/home_view.dart';
 import 'package:medgis_app/view/home/bloc/home_cubit.dart';
+import 'package:medgis_app/view/queue/bloc/queue_cubit.dart';
 import 'package:medgis_app/view/queue/view/queue_view.dart';
 
 class MainPage extends StatelessWidget {
@@ -24,6 +26,7 @@ class MainPage extends StatelessWidget {
     final MedicalRecordDao medicalRecordDao = MedicalRecordDao(database);
     final PatientService patientService =
         PatientService(patientDao, medicalRecordDao);
+    final QueueDao queueDao = QueueDao(database);
 
     return MultiBlocProvider(
       providers: [
@@ -39,6 +42,9 @@ class MainPage extends StatelessWidget {
         BlocProvider(
           create: (context) => DetailCubit(patientDao, medicalRecordDao),
         ),
+        BlocProvider(
+          create: (context) => QueueCubit(patientService, queueDao),
+        )
       ],
       child: Scaffold(
         backgroundColor: colorScheme.primary,
