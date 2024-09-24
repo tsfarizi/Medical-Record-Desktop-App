@@ -16,6 +16,13 @@ class PatientDao {
     return Patient.fromJson(record.toJson());
   }
 
+  Future<List<Patient>> getPatientsByIds(List<String> ids) async {
+    if (ids.isEmpty) return [];
+    final filter = 'id in ["${ids.join('","')}"]';
+    final records = await pb.collection('patient').getFullList(filter: filter);
+    return records.map((record) => Patient.fromJson(record.toJson())).toList();
+  }
+
   Future<void> insertPatient(Patient patient) async {
     int nextRegistrationNumber = await _getNextRegistrationNumber();
     Map<String, dynamic> patientData = patient.toJson();

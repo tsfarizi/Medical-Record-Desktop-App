@@ -22,6 +22,7 @@ class _QueueViewState extends State<QueueView> {
     searchController = TextEditingController();
     searchController.addListener(_onSearchChanged);
     context.read<QueueCubit>().fetchAllPatients();
+    context.read<QueueCubit>().fetchQueue();
   }
 
   @override
@@ -51,7 +52,7 @@ class _QueueViewState extends State<QueueView> {
                 child: BlocBuilder<QueueCubit, QueueState>(
                   builder: (context, state) {
                     if (state is QueueLoading) {
-                      return const CircularProgressIndicator();
+                      return const Center(child: CircularProgressIndicator());
                     } else if (state is QueueSucces) {
                       return SingleChildScrollView(
                         child: Column(
@@ -70,76 +71,74 @@ class _QueueViewState extends State<QueueView> {
                               ),
                             ),
                             DataTable(
-                                showCheckboxColumn: false,
-                                columnSpacing: 30,
-                                columns: const [
-                                  DataColumn(
-                                      label: SizedBox(
-                                          width: 20, child: Text("No"))),
-                                  DataColumn(
-                                      label: SizedBox(
-                                    width: 80,
-                                    child: Text("Birth Date"),
-                                  )),
-                                  DataColumn(
-                                      label: SizedBox(
-                                    width: 200,
-                                    child: Text("Name"),
-                                  )),
-                                  DataColumn(
-                                      label: SizedBox(
-                                    width: 80,
-                                    child: Text("Phone"),
-                                  )),
-                                  DataColumn(
-                                      label: SizedBox(
-                                    width: 80,
-                                    child: Text("Delete"),
-                                  ))
-                                ],
-                                rows: state.filteredPatients
-                                    .asMap()
-                                    .entries
-                                    .map((entry) {
-                                  int index = entry.key;
-                                  PatientWithMedicalRecords patientRecord =
-                                      entry.value;
+                              showCheckboxColumn: false,
+                              columnSpacing: 30,
+                              columns: const [
+                                DataColumn(
+                                    label:
+                                        SizedBox(width: 20, child: Text("No"))),
+                                DataColumn(
+                                    label: SizedBox(
+                                  width: 80,
+                                  child: Text("Birth Date"),
+                                )),
+                                DataColumn(
+                                    label: SizedBox(
+                                  width: 200,
+                                  child: Text("Name"),
+                                )),
+                                DataColumn(
+                                    label: SizedBox(
+                                  width: 80,
+                                  child: Text("Phone"),
+                                )),
+                                DataColumn(
+                                    label: SizedBox(
+                                  width: 80,
+                                  child: Text("Delete"),
+                                ))
+                              ],
+                              rows: state.filteredPatients
+                                  .asMap()
+                                  .entries
+                                  .map((entry) {
+                                int index = entry.key;
+                                PatientWithMedicalRecords patientRecord =
+                                    entry.value;
 
-                                  return DataRow(
-                                    onSelectChanged: (value) {
-                                      if (value != null && value) {
-                                        context
-                                            .read<QueueCubit>()
-                                            .addQueue(patientRecord.patient.id);
-                                        ScaffoldMessenger.of(dialogContext)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                              content: Text(
-                                                  "Add Patient successfully")),
-                                        );
-                                      }
-                                    },
-                                    cells: [
-                                      DataCell(Text((index + 1).toString())),
-                                      DataCell(Text(patientRecord
-                                          .patient.birthDate
-                                          .toLocal()
-                                          .toString()
-                                          .split(' ')[0])),
-                                      DataCell(
-                                          Text(patientRecord.patient.fullName)),
-                                      DataCell(
-                                          Text(patientRecord.patient.phone)),
-                                      DataCell(IconButton(
-                                        icon: const Icon(
-                                          Icons.delete_rounded,
-                                          color: Colors.red,
-                                        ),
-                                        onPressed: () {},
-                                      ))
-                                    ],
-                                  );
-                                }).toList())
+                                return DataRow(
+                                  onSelectChanged: (value) {
+                                    if (value != null && value) {
+                                      context
+                                          .read<QueueCubit>()
+                                          .addQueue(patientRecord.patient.id);
+                                      ScaffoldMessenger.of(dialogContext)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "Add Patient successfully")),
+                                      );
+                                    }
+                                  },
+                                  cells: [
+                                    DataCell(Text((index + 1).toString())),
+                                    DataCell(Text(DateFormat('yyyy-MM-dd')
+                                        .format(
+                                            patientRecord.patient.birthDate))),
+                                    DataCell(
+                                        Text(patientRecord.patient.fullName)),
+                                    DataCell(Text(patientRecord.patient.phone)),
+                                    DataCell(IconButton(
+                                      icon: const Icon(
+                                        Icons.delete_rounded,
+                                        color: Colors.red,
+                                      ),
+                                      onPressed: () {},
+                                    ))
+                                  ],
+                                );
+                              }).toList(),
+                            )
                           ],
                         ),
                       );
@@ -171,7 +170,7 @@ class _QueueViewState extends State<QueueView> {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const SizedBox(
-          width: 20,
+          height: 20,
         ),
         TextButton(
           onPressed: _showPatientDialog,
@@ -186,20 +185,62 @@ class _QueueViewState extends State<QueueView> {
             ],
           ),
         ),
-        Center(
-            child: DataTable(
-          columnSpacing: 30,
-          columns: const [
-            DataColumn(label: SizedBox(width: 20, child: Text("No"))),
-            DataColumn(
-                label: SizedBox(width: 150, child: Text("Registraion Number"))),
-            DataColumn(label: SizedBox(width: 200, child: Text("Name"))),
-            DataColumn(
-                label: SizedBox(width: 120, child: Text("Blood Pressure"))),
-            DataColumn(label: SizedBox(width: 120, child: Text("Delete")))
-          ],
-          rows: const [],
-        )),
+        Expanded(
+          child: BlocBuilder<QueueCubit, QueueState>(
+            builder: (context, state) {
+              if (state is QueueLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is QueueSucces) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columnSpacing: 30,
+                    columns: const [
+                      DataColumn(label: SizedBox(width: 20, child: Text("No"))),
+                      DataColumn(
+                          label: SizedBox(
+                              width: 150, child: Text("Registration Number"))),
+                      DataColumn(
+                          label: SizedBox(width: 200, child: Text("Name"))),
+                      DataColumn(
+                          label: SizedBox(
+                              width: 120, child: Text("Blood Pressure"))),
+                      DataColumn(
+                          label: SizedBox(width: 120, child: Text("Delete")))
+                    ],
+                    rows: state.patients.asMap().entries.map((entry) {
+                      int index = entry.key;
+                      PatientWithMedicalRecords patientRecord = entry.value;
+
+                      return DataRow(
+                        cells: [
+                          DataCell(Text((index + 1).toString())),
+                          DataCell(Text(patientRecord.patient.id)),
+                          DataCell(Text(patientRecord.patient.fullName)),
+                          DataCell(Text('')),
+                          DataCell(IconButton(
+                            icon: const Icon(
+                              Icons.delete_rounded,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              context
+                                  .read<QueueCubit>()
+                                  .deleteQueue(patientRecord.patient.id);
+                            },
+                          ))
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                );
+              } else if (state is QueueFailure) {
+                return Center(child: Text('Error: ${state.message}'));
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
       ],
     );
   }

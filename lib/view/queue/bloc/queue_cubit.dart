@@ -10,6 +10,7 @@ class QueueCubit extends Cubit<QueueState> {
 
   QueueCubit(this.patientService, this.queueDao) : super(QueueInitial()) {
     fetchAllPatients();
+    fetchQueue();
   }
 
   void fetchAllPatients() async {
@@ -23,11 +24,27 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
+  void fetchQueue() async {
+    try {
+      emit(QueueLoading());
+      final queue = await queueDao.getQueueByToday();
+      if (queue != null) {
+        final patients =
+            await patientService.getPatientsWithRecordsByIds(queue.patients);
+        emit(QueueSucces(patients, patients, queue));
+      } else {
+        emit(QueueSucces([], [], null));
+      }
+    } catch (e) {
+      emit(QueueFailure(e.toString()));
+    }
+  }
+
   void _emitSuccessState(List<PatientWithMedicalRecords> allPatients,
       [List<PatientWithMedicalRecords>? filteredPatients]) {
     filteredPatients ??= allPatients;
 
-    emit(QueueSucces(allPatients, filteredPatients));
+    emit(QueueSucces(allPatients, filteredPatients, null));
   }
 
   void filterPatients(String query) {
@@ -68,6 +85,16 @@ class QueueCubit extends Cubit<QueueState> {
   Future<void> addQueue(String patientId) async {
     try {
       await queueDao.insertQueue(patientId);
+      fetchQueue();
+    } catch (e) {
+      emit(QueueFailure(e.toString()));
+    }
+  }
+
+  Future<void> deleteQueue(String queueId) async {
+    try {
+      await queueDao.deleteQueue(queueId);
+      fetchQueue();
     } catch (e) {
       emit(QueueFailure(e.toString()));
     }

@@ -7,6 +7,20 @@ import 'package:medgis_app/utils/models/medical_record_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+class PatientWithMedicalRecords {
+  final Patient patient;
+  final List<MedicalRecord> medicalRecords;
+  final DateTime? registered;
+  final DateTime? lastVisited;
+
+  PatientWithMedicalRecords({
+    required this.patient,
+    required this.medicalRecords,
+    this.registered,
+    this.lastVisited,
+  });
+}
+
 class PatientService {
   final PatientDao patientDao;
   final MedicalRecordDao medicalRecordDao;
@@ -15,6 +29,30 @@ class PatientService {
 
   Future<List<PatientWithMedicalRecords>> getAllPatientsWithRecords() async {
     final patients = await patientDao.getAllPatients();
+    final List<PatientWithMedicalRecords> result = [];
+
+    for (final patient in patients) {
+      final medicalRecords =
+          await medicalRecordDao.getMedicalRecordsByPatient(patient.id);
+      final registered =
+          medicalRecords.isNotEmpty ? medicalRecords.first.date : null;
+      final lastVisited =
+          medicalRecords.isNotEmpty ? medicalRecords.last.date : null;
+
+      result.add(PatientWithMedicalRecords(
+        patient: patient,
+        medicalRecords: medicalRecords,
+        registered: registered,
+        lastVisited: lastVisited,
+      ));
+    }
+    return result;
+  }
+
+  Future<List<PatientWithMedicalRecords>> getPatientsWithRecordsByIds(
+      List<String> ids) async {
+    if (ids.isEmpty) return [];
+    final patients = await patientDao.getPatientsByIds(ids);
     final List<PatientWithMedicalRecords> result = [];
 
     for (final patient in patients) {
@@ -230,18 +268,4 @@ class PatientService {
     if (date == null) return '';
     return '${date.day}/${date.month}/${date.year}';
   }
-}
-
-class PatientWithMedicalRecords {
-  final Patient patient;
-  final List<MedicalRecord> medicalRecords;
-  final DateTime? registered;
-  final DateTime? lastVisited;
-
-  PatientWithMedicalRecords({
-    required this.patient,
-    required this.medicalRecords,
-    this.registered,
-    this.lastVisited,
-  });
 }
