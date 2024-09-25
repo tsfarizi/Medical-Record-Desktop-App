@@ -1,4 +1,3 @@
-import 'package:medgis_app/utils/models/queue_model.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
 
 abstract class QueueState {}
@@ -7,16 +6,14 @@ class QueueInitial extends QueueState {}
 
 class QueueLoading extends QueueState {}
 
-class QueueSucces extends QueueState {
-  final List<PatientWithMedicalRecords> patients;
-  final List<PatientWithMedicalRecords> filteredPatients;
-  final Queue? queue;
+class QueueSuccess extends QueueState {
+  final List<PatientWithMedicalRecords> allPatients;
+  final List<String> queuePatientIds;
 
-  QueueSucces(
-    this.patients,
-    this.filteredPatients,
-    this.queue,
-  );
+  QueueSuccess({
+    required this.allPatients,
+    required this.queuePatientIds,
+  });
 }
 
 class QueueFailure extends QueueState {

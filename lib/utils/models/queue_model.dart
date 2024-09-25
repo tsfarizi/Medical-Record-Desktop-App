@@ -1,22 +1,20 @@
 class Queue {
   final String id;
-  final DateTime dateTime;
+  final DateTime date;
   final List<String> patients;
 
-  Queue({required this.id, required this.dateTime, required this.patients});
+  Queue({
+    required this.id,
+    required this.date,
+    required this.patients,
+  });
 
   factory Queue.fromJson(Map<String, dynamic> json) {
     return Queue(
       id: json['id'],
-      dateTime: DateTime.parse(json['date']),
-      patients: List<String>.from(json['patients']),
+      date: DateTime.parse(json['date']),
+      patients:
+          json['patients'] != null ? List<String>.from(json['patients']) : [],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'date': dateTime.toIso8601String(),
-      'patients': patients,
-    };
   }
 }
