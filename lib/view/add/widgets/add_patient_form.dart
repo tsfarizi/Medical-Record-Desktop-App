@@ -93,12 +93,12 @@ class AddPatientFormState extends State<AddPatientForm> {
           padding: const EdgeInsets.all(20.0),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
-              maxWidth: 400, // Atur lebar maksimum sesuai kebutuhan
+              maxWidth: 400,
             ),
             child: Form(
               key: formKey,
               child: Column(
-                mainAxisSize: MainAxisSize.min, // Agar kolom tidak melebar
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
