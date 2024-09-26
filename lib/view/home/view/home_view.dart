@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/view/add/bloc/add_cubit.dart';
-import 'package:medgis_app/view/add/view/add_view.dart';
+import 'package:medgis_app/view/add/widgets/add_patient_form.dart';
 import 'package:medgis_app/view/home/bloc/home_cubit.dart';
 import 'package:medgis_app/view/home/bloc/home_state.dart';
 import 'package:medgis_app/view/home/widgets/chart.dart';
@@ -40,14 +40,16 @@ class _HomeViewState extends State<HomeView> {
       context: context,
       builder: (BuildContext dialogContext) {
         return BlocProvider.value(
-          value: context.read<HomeCubit>(),
-          child: BlocProvider.value(
-            value: context.read<AddCubit>(),
-            child: Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: const AddView(),
+          value: context.read<AddCubit>(),
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: AddPatientForm(
+              onPatientAdded: () {
+                // Refresh the patient list after adding a patient
+                context.read<HomeCubit>().fetchAllPatients();
+              },
             ),
           ),
         );

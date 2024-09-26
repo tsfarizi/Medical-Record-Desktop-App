@@ -4,10 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/utils/models/patient_model.dart';
 import 'package:medgis_app/view/add/bloc/add_cubit.dart';
 import 'package:medgis_app/view/add/bloc/add_state.dart';
-import 'package:medgis_app/view/home/bloc/home_cubit.dart';
 
 class AddPatientForm extends StatefulWidget {
-  const AddPatientForm({super.key});
+  final VoidCallback? onPatientAdded;
+
+  const AddPatientForm({Key? key, this.onPatientAdded}) : super(key: key);
 
   @override
   State<AddPatientForm> createState() => AddPatientFormState();
@@ -80,7 +81,12 @@ class AddPatientFormState extends State<AddPatientForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Patient saved successfully')),
           );
-          context.read<HomeCubit>().fetchAllPatients();
+
+          // Invoke the callback if provided
+          if (widget.onPatientAdded != null) {
+            widget.onPatientAdded!();
+          }
+
           Navigator.of(context).pop();
         } else if (state is AddFailure) {
           ScaffoldMessenger.of(context).showSnackBar(

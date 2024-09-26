@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
+import 'package:medgis_app/view/add/bloc/add_cubit.dart';
+import 'package:medgis_app/view/add/widgets/add_patient_form.dart';
 import 'package:medgis_app/view/queue/bloc/queue_cubit.dart';
 import 'package:medgis_app/view/queue/bloc/queue_state.dart';
 
@@ -132,6 +134,12 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
                 Expanded(
                   child: _buildAvailablePatientsTable(state),
                 ),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: _showAddPatientDialog,
+                  icon: const Icon(Icons.person_add),
+                  label: const Text('Add New Patient'),
+                ),
               ],
             );
           } else if (state is QueueFailure) {
@@ -140,6 +148,36 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
           return Container();
         },
       ),
+    );
+  }
+
+  void _showAddPatientDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return BlocProvider.value(
+          value: context.read<AddCubit>(),
+          child: Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: AddPatientForm(
+              onPatientAdded: () async {
+                await context.read<QueueCubit>().fetchAllPatients();
+                final newPatient =
+                    context.read<QueueCubit>().getMostRecentPatient();
+                if (newPatient != null) {
+                  context
+                      .read<QueueCubit>()
+                      .addToLocalQueue(newPatient.patient.id);
+                }
+                Navigator.of(dialogContext).pop();
+                setState(() {});
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

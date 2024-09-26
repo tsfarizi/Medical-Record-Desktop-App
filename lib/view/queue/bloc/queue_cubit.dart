@@ -77,4 +77,15 @@ class QueueCubit extends Cubit<QueueState> {
       emit(QueueFailure(e.toString()));
     }
   }
+
+  PatientWithMedicalRecords? getMostRecentPatient() {
+    if (state is QueueSuccess) {
+      final patients = (state as QueueSuccess).allPatients;
+      if (patients.isNotEmpty) {
+        // Assuming the most recently added patient is the last in the list
+        return patients.last;
+      }
+    }
+    return null;
+  }
 }

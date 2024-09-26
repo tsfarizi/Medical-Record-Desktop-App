@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
+import 'package:medgis_app/view/add/bloc/add_cubit.dart';
 import 'package:medgis_app/view/queue/bloc/queue_cubit.dart';
 import 'package:medgis_app/view/queue/bloc/queue_state.dart';
 import 'package:intl/intl.dart';
@@ -25,12 +26,15 @@ class _QueueViewState extends State<QueueView> {
       context: context,
       builder: (BuildContext dialogContext) {
         return BlocProvider.value(
-          value: context.read<QueueCubit>(),
-          child: Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+          value: context.read<AddCubit>(),
+          child: BlocProvider.value(
+            value: context.read<QueueCubit>(),
+            child: Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: const PatientDialogContent(),
             ),
-            child: const PatientDialogContent(),
           ),
         );
       },
