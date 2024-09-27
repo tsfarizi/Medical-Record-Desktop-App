@@ -164,15 +164,17 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
             child: AddPatientForm(
               onPatientAdded: () async {
                 await context.read<QueueCubit>().fetchAllPatients();
-                final newPatient =
-                    context.read<QueueCubit>().getMostRecentPatient();
-                if (newPatient != null) {
-                  context
-                      .read<QueueCubit>()
-                      .addToLocalQueue(newPatient.patient.id);
+                if (mounted) {
+                  final newPatient =
+                      context.read<QueueCubit>().getMostRecentPatient();
+                  if (newPatient != null) {
+                    context
+                        .read<QueueCubit>()
+                        .addToLocalQueue(newPatient.patient.id);
+                  }
+                  Navigator.of(context).pop();
+                  setState(() {});
                 }
-                Navigator.of(dialogContext).pop();
-                setState(() {});
               },
             ),
           ),

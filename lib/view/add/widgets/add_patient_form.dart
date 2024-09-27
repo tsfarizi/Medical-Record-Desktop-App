@@ -8,7 +8,7 @@ import 'package:medgis_app/view/add/bloc/add_state.dart';
 class AddPatientForm extends StatefulWidget {
   final VoidCallback? onPatientAdded;
 
-  const AddPatientForm({Key? key, this.onPatientAdded}) : super(key: key);
+  const AddPatientForm({super.key, this.onPatientAdded});
 
   @override
   State<AddPatientForm> createState() => AddPatientFormState();
