@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/page/bloc/main_cubit.dart';
 import 'package:medgis_app/page/bloc/main_state.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
+import 'package:medgis_app/utils/theme/color_scheme.dart';
 import 'package:medgis_app/view/detail/bloc/detail_cubit.dart';
 import 'package:medgis_app/view/home/bloc/home_cubit.dart';
 import 'package:file_selector/file_selector.dart';
@@ -46,6 +47,8 @@ class _MainTableState extends State<MainTable> {
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: DataTable(
+          headingRowColor: WidgetStateColor.resolveWith(
+              (states) => colorScheme.primaryContainer),
           columnSpacing: 40,
           showCheckboxColumn: false,
           columns: const [

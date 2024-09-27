@@ -8,7 +8,7 @@ import 'package:medgis_app/utils/dao/patients_dao.dart';
 import 'package:medgis_app/utils/dao/queue_dao.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/theme/color_scheme.dart';
-import 'package:medgis_app/view/add/bloc/add_cubit.dart';
+import 'package:medgis_app/view/shared/add/bloc/add_cubit.dart';
 import 'package:medgis_app/view/detail/bloc/detail_cubit.dart';
 import 'package:medgis_app/view/detail/view/detail_view.dart';
 import 'package:medgis_app/view/home/view/home_view.dart';

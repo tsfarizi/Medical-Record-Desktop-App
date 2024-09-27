@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:medgis_app/view/add/bloc/add_cubit.dart';
-import 'package:medgis_app/view/add/widgets/add_patient_form.dart';
+import 'package:medgis_app/view/shared/add/bloc/add_cubit.dart';
+import 'package:medgis_app/view/shared/add/view/add_patient_form.dart';
 import 'package:medgis_app/view/home/bloc/home_cubit.dart';
 import 'package:medgis_app/view/home/bloc/home_state.dart';
 import 'package:medgis_app/view/home/widgets/chart.dart';

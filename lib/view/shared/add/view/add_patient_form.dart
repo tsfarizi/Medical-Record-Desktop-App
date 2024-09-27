@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/utils/models/patient_model.dart';
-import 'package:medgis_app/view/add/bloc/add_cubit.dart';
-import 'package:medgis_app/view/add/bloc/add_state.dart';
+import 'package:medgis_app/view/shared/add/bloc/add_cubit.dart';
+import 'package:medgis_app/view/shared/add/bloc/add_state.dart';
 
 class AddPatientForm extends StatefulWidget {
   final VoidCallback? onPatientAdded;
@@ -82,7 +82,6 @@ class AddPatientFormState extends State<AddPatientForm> {
             const SnackBar(content: Text('Patient saved successfully')),
           );
 
-          // Invoke the callback if provided
           if (widget.onPatientAdded != null) {
             widget.onPatientAdded!();
           }
@@ -94,7 +93,17 @@ class AddPatientFormState extends State<AddPatientForm> {
           );
         }
       },
-      child: SingleChildScrollView(
+      child: Focus(
+        autofocus: true,
+        onKeyEvent: (node, event) {
+          if (event is KeyDownEvent &&
+              event.logicalKey == LogicalKeyboardKey.escape) {
+            Navigator.pop(context);
+
+            return KeyEventResult.handled;
+          }
+          return KeyEventResult.ignored;
+        },
         child: Padding(
           padding: const EdgeInsets.all(20.0),
           child: ConstrainedBox(

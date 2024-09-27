@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
-import 'package:medgis_app/view/add/bloc/add_cubit.dart';
-import 'package:medgis_app/view/add/widgets/add_patient_form.dart';
+import 'package:medgis_app/utils/theme/color_scheme.dart';
+import 'package:medgis_app/view/shared/add/bloc/add_cubit.dart';
+import 'package:medgis_app/view/shared/add/view/add_patient_form.dart';
 import 'package:medgis_app/view/queue/bloc/queue_cubit.dart';
 import 'package:medgis_app/view/queue/bloc/queue_state.dart';
 
@@ -53,7 +54,7 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
             child: DataTable(
               showCheckboxColumn: false,
               headingRowColor: WidgetStateColor.resolveWith(
-                  (states) => Colors.blueGrey.shade100),
+                  (states) => colorScheme.primaryContainer),
               columns: const [
                 DataColumn(label: Text("No")),
                 DataColumn(label: Text("Registration Number")),
