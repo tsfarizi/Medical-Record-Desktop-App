@@ -1,27 +1,4 @@
-import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/models/medical_record_model.dart';
-
-abstract class QueueState {}
-
-class QueueInitial extends QueueState {}
-
-class QueueLoading extends QueueState {}
-
-class QueueSuccess extends QueueState {
-  final List<PatientWithMedicalRecords> allPatients;
-  final List<QueuePatientData> queuePatients;
-
-  QueueSuccess({
-    required this.allPatients,
-    required this.queuePatients,
-  });
-}
-
-class QueueFailure extends QueueState {
-  final String message;
-
-  QueueFailure(this.message);
-}
 
 class QueuePatientData {
   final String patientId;

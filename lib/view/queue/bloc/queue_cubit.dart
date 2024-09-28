@@ -1,13 +1,15 @@
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/dao/queue_dao.dart';
 import 'package:medgis_app/view/queue/bloc/queue_state.dart';
+import 'package:medgis_app/utils/models/medical_record_model.dart';
 
 class QueueCubit extends Cubit<QueueState> {
   final PatientService patientService;
   final QueueDao queueDao;
-  List<String> localQueuePatientIds = [];
+  List<QueuePatientData> localQueuePatients = [];
 
   QueueCubit(this.patientService, this.queueDao) : super(QueueInitial()) {
     _initialize();
@@ -20,12 +22,20 @@ class QueueCubit extends Cubit<QueueState> {
 
   Future<void> _loadLocalQueue() async {
     final prefs = await SharedPreferences.getInstance();
-    localQueuePatientIds = prefs.getStringList('localQueuePatientIds') ?? [];
+    List<String>? queuePatientJsonList =
+        prefs.getStringList('localQueuePatients');
+    if (queuePatientJsonList != null) {
+      localQueuePatients = queuePatientJsonList
+          .map((jsonStr) => QueuePatientData.fromJson(jsonDecode(jsonStr)))
+          .toList();
+    }
   }
 
   Future<void> _saveLocalQueue() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList('localQueuePatientIds', localQueuePatientIds);
+    List<String> queuePatientJsonList =
+        localQueuePatients.map((p) => jsonEncode(p.toJson())).toList();
+    await prefs.setStringList('localQueuePatients', queuePatientJsonList);
   }
 
   Future<void> fetchAllPatients() async {
@@ -33,7 +43,7 @@ class QueueCubit extends Cubit<QueueState> {
       final allPatients = await patientService.getAllPatientsWithRecords();
       emit(QueueSuccess(
         allPatients: allPatients,
-        queuePatientIds: localQueuePatientIds,
+        queuePatients: localQueuePatients,
       ));
     } catch (e) {
       emit(QueueFailure(e.toString()));
@@ -41,36 +51,80 @@ class QueueCubit extends Cubit<QueueState> {
   }
 
   void addToLocalQueue(String patientId) {
-    if (!localQueuePatientIds.contains(patientId)) {
-      localQueuePatientIds.add(patientId);
+    if (!localQueuePatients.any((p) => p.patientId == patientId)) {
+      localQueuePatients.add(QueuePatientData(patientId: patientId));
       _saveLocalQueue();
-      if (state is QueueSuccess) {
-        emit(QueueSuccess(
-          allPatients: (state as QueueSuccess).allPatients,
-          queuePatientIds: localQueuePatientIds,
-        ));
-      }
+      _emitSuccessState();
     }
   }
 
   void removeFromLocalQueue(String patientId) {
-    if (localQueuePatientIds.contains(patientId)) {
-      localQueuePatientIds.remove(patientId);
-      _saveLocalQueue();
-      if (state is QueueSuccess) {
-        emit(QueueSuccess(
-          allPatients: (state as QueueSuccess).allPatients,
-          queuePatientIds: localQueuePatientIds,
-        ));
-      }
+    localQueuePatients.removeWhere((p) => p.patientId == patientId);
+    _saveLocalQueue();
+    _emitSuccessState();
+  }
+
+  void updateBloodPressure(String patientId, String bloodPressure) {
+    final queuePatientIndex =
+        localQueuePatients.indexWhere((p) => p.patientId == patientId);
+    QueuePatientData queuePatient;
+
+    if (queuePatientIndex != -1) {
+      queuePatient = localQueuePatients[queuePatientIndex];
+    } else {
+      queuePatient = QueuePatientData(patientId: patientId);
+      localQueuePatients.add(queuePatient);
     }
+
+    queuePatient.bloodPressure = bloodPressure;
+    _saveLocalQueue();
+    _emitSuccessState();
+  }
+
+  void addMedicalRecord(String patientId, String therapyAndDiagnosis,
+      String anamnesaAndExamination) {
+    final queuePatientIndex =
+        localQueuePatients.indexWhere((p) => p.patientId == patientId);
+    QueuePatientData queuePatient;
+
+    if (queuePatientIndex != -1) {
+      queuePatient = localQueuePatients[queuePatientIndex];
+    } else {
+      queuePatient = QueuePatientData(patientId: patientId);
+      localQueuePatients.add(queuePatient);
+    }
+
+    queuePatient.medicalRecords.add(
+      MedicalRecord(
+        id: '',
+        patientId: patientId,
+        date: DateTime.now(),
+        therapyAndDiagnosis: therapyAndDiagnosis,
+        anamnesaAndExamination: anamnesaAndExamination,
+      ),
+    );
+    _saveLocalQueue();
+    _emitSuccessState();
   }
 
   Future<void> submitQueueToDatabase() async {
-    if (localQueuePatientIds.isEmpty) return;
+    if (localQueuePatients.isEmpty) return;
     try {
-      await queueDao.insertQueue(localQueuePatientIds);
-      localQueuePatientIds.clear();
+      for (var queuePatient in localQueuePatients) {
+        if (queuePatient.bloodPressure != null) {
+          await patientService.updatePatientBloodPressure(
+              queuePatient.patientId, queuePatient.bloodPressure!);
+        }
+        if (queuePatient.medicalRecords.isNotEmpty) {
+          for (var record in queuePatient.medicalRecords) {
+            await patientService.addMedicalRecordToPatient(
+                queuePatient.patientId, record);
+          }
+        }
+      }
+      await queueDao
+          .insertQueue(localQueuePatients.map((p) => p.patientId).toList());
+      localQueuePatients.clear();
       await _saveLocalQueue();
       await fetchAllPatients();
     } catch (e) {
@@ -78,11 +132,20 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
+  void _emitSuccessState() {
+    if (state is QueueSuccess || state is QueueInitial) {
+      emit(QueueSuccess(
+        allPatients:
+            state is QueueSuccess ? (state as QueueSuccess).allPatients : [],
+        queuePatients: localQueuePatients,
+      ));
+    }
+  }
+
   PatientWithMedicalRecords? getMostRecentPatient() {
     if (state is QueueSuccess) {
       final patients = (state as QueueSuccess).allPatients;
       if (patients.isNotEmpty) {
-        // Assuming the most recently added patient is the last in the list
         return patients.last;
       }
     }

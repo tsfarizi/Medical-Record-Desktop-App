@@ -13,39 +13,23 @@ class MedicalRecord {
     required this.anamnesaAndExamination,
   });
 
-  MedicalRecord copyWith({
-    String? id,
-    String? patientId,
-    DateTime? date,
-    String? therapyAndDiagnosis,
-    String? anamnesaAndExamination,
-  }) {
-    return MedicalRecord(
-      id: id ?? this.id,
-      patientId: patientId ?? this.patientId,
-      date: date ?? this.date,
-      therapyAndDiagnosis: therapyAndDiagnosis ?? this.therapyAndDiagnosis,
-      anamnesaAndExamination:
-          anamnesaAndExamination ?? this.anamnesaAndExamination,
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'patientId': patientId,
+      'date': date.toIso8601String(),
+      'therapyAndDiagnosis': therapyAndDiagnosis,
+      'anamnesaAndExamination': anamnesaAndExamination,
+    };
   }
 
   factory MedicalRecord.fromJson(Map<String, dynamic> json) {
     return MedicalRecord(
-      id: json['id'] as String,
-      patientId: json['patient_id'] as String,
-      date: DateTime.parse(json['date'] as String),
-      therapyAndDiagnosis: json['therapy_and_diagnosis'] as String,
-      anamnesaAndExamination: json['anamnesa_and_examination'] as String,
+      id: json['id'],
+      patientId: json['patientId'],
+      date: DateTime.parse(json['date']),
+      therapyAndDiagnosis: json['therapyAndDiagnosis'],
+      anamnesaAndExamination: json['anamnesaAndExamination'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'patient_id': patientId,
-      'date': date.toIso8601String(),
-      'therapy_and_diagnosis': therapyAndDiagnosis,
-      'anamnesa_and_examination': anamnesaAndExamination,
-    };
   }
 }

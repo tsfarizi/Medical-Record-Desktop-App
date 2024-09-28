@@ -18,8 +18,7 @@ class PatientDao {
 
   Future<List<Patient>> getPatientsByIds(List<String> ids) async {
     if (ids.isEmpty) return [];
-    final idsString = ids.map((id) => "'$id'").join(',');
-    final filter = 'id ?= [$idsString]';
+    final filter = 'id IN (${ids.map((id) => "'$id'").join(',')})';
     final records = await pb.collection('patient').getFullList(filter: filter);
     return records.map((record) => Patient.fromJson(record.toJson())).toList();
   }
@@ -46,6 +45,13 @@ class PatientDao {
 
   Future<void> updatePatient(Patient patient) async {
     await pb.collection('patient').update(patient.id, body: patient.toJson());
+  }
+
+  Future<void> updatePatientBloodPressure(
+      String patientId, String bloodPressure) async {
+    await pb.collection('patient').update(patientId, body: {
+      'blood_pressure': bloodPressure,
+    });
   }
 
   Future<void> deletePatient(String id) async {

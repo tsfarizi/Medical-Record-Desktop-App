@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:medgis_app/utils/dao/medical_record_dao.dart';
 import 'package:medgis_app/utils/dao/patients_dao.dart';
-import 'package:medgis_app/utils/models/patient_model.dart';
 import 'package:medgis_app/utils/models/medical_record_model.dart';
+import 'package:medgis_app/utils/models/patient_model.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -233,7 +233,7 @@ class PatientService {
     final headers = [
       'Date',
       'Therapy and Diagnosis',
-      'Anamnesa and Examination'
+      'Anamnesa and Examination',
     ];
     final data = patientRecord.medicalRecords.map((record) {
       return [
@@ -267,5 +267,15 @@ class PatientService {
   String _formatDate(DateTime? date) {
     if (date == null) return '';
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  Future<void> updatePatientBloodPressure(
+      String patientId, String bloodPressure) async {
+    await patientDao.updatePatientBloodPressure(patientId, bloodPressure);
+  }
+
+  Future<void> addMedicalRecordToPatient(
+      String patientId, MedicalRecord record) async {
+    await medicalRecordDao.insertMedicalRecord(record);
   }
 }

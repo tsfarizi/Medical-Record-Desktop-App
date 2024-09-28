@@ -31,7 +31,9 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
   }
 
   Widget _buildAvailablePatientsTable(QueueSuccess state) {
-    final queuePatientIds = state.queuePatientIds.toSet();
+    // Perbaikan di sini
+    final queuePatientIds = state.queuePatients.map((p) => p.patientId).toSet();
+
     List<PatientWithMedicalRecords> availablePatients = state.allPatients
         .where((patient) => !queuePatientIds.contains(patient.patient.id))
         .toList();
@@ -53,7 +55,7 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
             scrollDirection: Axis.horizontal,
             child: DataTable(
               showCheckboxColumn: false,
-              headingRowColor: WidgetStateColor.resolveWith(
+              headingRowColor: MaterialStateColor.resolveWith(
                   (states) => colorScheme.primaryContainer),
               columns: const [
                 DataColumn(label: Text("No")),

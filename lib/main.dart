@@ -10,7 +10,7 @@ void main() async {
 
   Process pocketBaseProcess = await Process.start(
     pocketBasePath,
-    ['serve', '--http=192.168.43.41:2003'],
+    ['serve', '--http=192.168.111.41:2003'],
   );
 
   await Future.delayed(const Duration(seconds: 2));
