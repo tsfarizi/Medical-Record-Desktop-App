@@ -17,11 +17,11 @@ import 'package:medgis_app/view/queue/bloc/queue_cubit.dart';
 import 'package:medgis_app/view/queue/view/queue_view.dart';
 
 class MainPage extends StatelessWidget {
-  const MainPage({super.key});
+  final String database;
+  const MainPage({super.key, required this.database});
 
   @override
   Widget build(BuildContext context) {
-    const String database = "http://192.168.111.41:2003";
     final PatientDao patientDao = PatientDao(database);
     final MedicalRecordDao medicalRecordDao = MedicalRecordDao(database);
     final PatientService patientService =
