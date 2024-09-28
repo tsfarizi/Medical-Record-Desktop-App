@@ -39,6 +39,7 @@ class QueueCubit extends Cubit<QueueState> {
   }
 
   Future<void> fetchAllPatients() async {
+    emit(QueueLoading());
     try {
       final allPatients = await patientService.getAllPatientsWithRecords();
       emit(QueueSuccess(
@@ -81,8 +82,7 @@ class QueueCubit extends Cubit<QueueState> {
     _emitSuccessState();
   }
 
-  void addMedicalRecord(String patientId, String therapyAndDiagnosis,
-      String anamnesaAndExamination) {
+  void setMedicalRecord(String patientId, MedicalRecord record) {
     final queuePatientIndex =
         localQueuePatients.indexWhere((p) => p.patientId == patientId);
     QueuePatientData queuePatient;
@@ -94,21 +94,20 @@ class QueueCubit extends Cubit<QueueState> {
       localQueuePatients.add(queuePatient);
     }
 
-    queuePatient.medicalRecords.add(
-      MedicalRecord(
-        id: '',
-        patientId: patientId,
-        date: DateTime.now(),
-        therapyAndDiagnosis: therapyAndDiagnosis,
-        anamnesaAndExamination: anamnesaAndExamination,
-      ),
-    );
+    // Menggunakan hanya satu rekam medis per pasien
+    if (queuePatient.medicalRecords.isEmpty) {
+      queuePatient.medicalRecords.add(record);
+    } else {
+      queuePatient.medicalRecords[0] = record;
+    }
+
     _saveLocalQueue();
     _emitSuccessState();
   }
 
   Future<void> submitQueueToDatabase() async {
     if (localQueuePatients.isEmpty) return;
+    emit(QueueLoading());
     try {
       for (var queuePatient in localQueuePatients) {
         if (queuePatient.bloodPressure != null) {

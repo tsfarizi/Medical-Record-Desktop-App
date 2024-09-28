@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medgis_app/utils/models/medical_record_model.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/theme/color_scheme.dart';
 import 'package:medgis_app/view/shared/add/bloc/add_cubit.dart';
@@ -89,7 +90,7 @@ class _QueueViewState extends State<QueueView> {
                           queuePatient.bloodPressure!.isEmpty) {
                         _inputBloodPressure(context, queuePatient);
                       } else {
-                        _addMedicalRecord(context, queuePatient);
+                        _handleMedicalRecord(context, queuePatient);
                       }
                     }
                   },
@@ -160,22 +161,51 @@ class _QueueViewState extends State<QueueView> {
     );
   }
 
-  void _addMedicalRecord(BuildContext context, QueuePatientData queuePatient) {
+  void _handleMedicalRecord(
+      BuildContext context, QueuePatientData queuePatient) {
+    MedicalRecord? existingRecord;
+    if (queuePatient.medicalRecords.isNotEmpty) {
+      existingRecord = queuePatient.medicalRecords.first;
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return MedicalRecordForm(
           patientId: queuePatient.patientId,
+          record: existingRecord,
           onRecordSaved: (therapy, anamnesa) {
-            context.read<QueueCubit>().addMedicalRecord(
-                  queuePatient.patientId,
-                  therapy,
-                  anamnesa,
-                );
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Medical record saved successfully')),
-            );
+            if (existingRecord == null) {
+              context.read<QueueCubit>().setMedicalRecord(
+                    queuePatient.patientId,
+                    MedicalRecord(
+                      id: '',
+                      patientId: queuePatient.patientId,
+                      date: DateTime.now(),
+                      therapyAndDiagnosis: therapy,
+                      anamnesaAndExamination: anamnesa,
+                    ),
+                  );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Medical record added successfully')),
+              );
+            } else {
+              context.read<QueueCubit>().setMedicalRecord(
+                    queuePatient.patientId,
+                    MedicalRecord(
+                      id: existingRecord.id,
+                      patientId: existingRecord.patientId,
+                      date: existingRecord.date,
+                      therapyAndDiagnosis: therapy,
+                      anamnesaAndExamination: anamnesa,
+                    ),
+                  );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Medical record updated successfully')),
+              );
+            }
           },
         );
       },
