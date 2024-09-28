@@ -13,23 +13,22 @@ class MedicalRecord {
     required this.anamnesaAndExamination,
   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'patientId': patientId,
-      'date': date.toIso8601String(),
-      'therapyAndDiagnosis': therapyAndDiagnosis,
-      'anamnesaAndExamination': anamnesaAndExamination,
-    };
-  }
-
   factory MedicalRecord.fromJson(Map<String, dynamic> json) {
     return MedicalRecord(
-      id: json['id'],
-      patientId: json['patientId'],
+      id: json['id'] ?? '',
+      patientId: json['patient_id'],
       date: DateTime.parse(json['date']),
-      therapyAndDiagnosis: json['therapyAndDiagnosis'],
-      anamnesaAndExamination: json['anamnesaAndExamination'],
+      therapyAndDiagnosis: json['therapy_and_diagnosis'],
+      anamnesaAndExamination: json['anamnesa_and_examination'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'patient_id': patientId,
+      'date': date.toIso8601String(),
+      'therapy_and_diagnosis': therapyAndDiagnosis,
+      'anamnesa_and_examination': anamnesaAndExamination,
+    };
   }
 }

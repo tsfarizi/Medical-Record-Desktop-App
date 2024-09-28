@@ -94,7 +94,6 @@ class QueueCubit extends Cubit<QueueState> {
       localQueuePatients.add(queuePatient);
     }
 
-    // Menggunakan hanya satu rekam medis per pasien
     if (queuePatient.medicalRecords.isEmpty) {
       queuePatient.medicalRecords.add(record);
     } else {

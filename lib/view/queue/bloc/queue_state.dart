@@ -1,5 +1,5 @@
-import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/models/medical_record_model.dart';
+import 'package:medgis_app/utils/services/patient_service.dart';
 
 abstract class QueueState {}
 

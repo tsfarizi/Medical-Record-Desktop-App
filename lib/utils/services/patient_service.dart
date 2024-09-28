@@ -77,6 +77,16 @@ class PatientService {
     await patientDao.deletePatient(patientId);
   }
 
+  Future<void> updatePatientBloodPressure(
+      String patientId, String bloodPressure) async {
+    await patientDao.updatePatientBloodPressure(patientId, bloodPressure);
+  }
+
+  Future<void> addMedicalRecordToPatient(
+      String patientId, MedicalRecord record) async {
+    await medicalRecordDao.insertMedicalRecord(record);
+  }
+
   Future<void> printSinglePatientData(
       PatientWithMedicalRecords patientRecord, String filePath) async {
     final pdf = pw.Document();
@@ -267,15 +277,5 @@ class PatientService {
   String _formatDate(DateTime? date) {
     if (date == null) return '';
     return '${date.day}/${date.month}/${date.year}';
-  }
-
-  Future<void> updatePatientBloodPressure(
-      String patientId, String bloodPressure) async {
-    await patientDao.updatePatientBloodPressure(patientId, bloodPressure);
-  }
-
-  Future<void> addMedicalRecordToPatient(
-      String patientId, MedicalRecord record) async {
-    await medicalRecordDao.insertMedicalRecord(record);
   }
 }
