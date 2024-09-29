@@ -7,13 +7,13 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  String ip = '192.168.111.41';
+  String baseUrl = '192.168.25.41:2003';
 
   String pocketBasePath = '../pocketbase_0.22.20_windows_amd64/pocketbase.exe';
 
   Process pocketBaseProcess = await Process.start(
     pocketBasePath,
-    ['serve', '--http=$ip:2003'],
+    ['serve', '--http=$baseUrl'],
   );
 
   await Future.delayed(const Duration(seconds: 2));
@@ -32,7 +32,7 @@ void main() async {
     debugShowCheckedModeBanner: false,
     theme: themeData,
     home: MainPage(
-      database: ip,
+      database: baseUrl,
     ),
   ));
 

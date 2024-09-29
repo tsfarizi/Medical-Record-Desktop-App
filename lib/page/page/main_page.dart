@@ -22,11 +22,13 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PatientDao patientDao = PatientDao(database);
-    final MedicalRecordDao medicalRecordDao = MedicalRecordDao(database);
+    final String databaseConection = 'http://$database';
+    final PatientDao patientDao = PatientDao(databaseConection);
+    final MedicalRecordDao medicalRecordDao =
+        MedicalRecordDao(databaseConection);
     final PatientService patientService =
         PatientService(patientDao, medicalRecordDao);
-    final QueueDao queueDao = QueueDao(database);
+    final QueueDao queueDao = QueueDao(databaseConection);
 
     return MultiBlocProvider(
       providers: [
