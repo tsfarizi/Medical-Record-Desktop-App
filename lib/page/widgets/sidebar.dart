@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medgis_app/page/bloc/main_cubit.dart';
 import 'package:medgis_app/page/bloc/main_state.dart';
-import 'package:medgis_app/page/widgets/button_section.dart';
-import 'package:medgis_app/page/widgets/data_visualization_section.dart';
-import 'package:medgis_app/page/widgets/table_section.dart';
 import 'package:medgis_app/utils/theme/color_scheme.dart';
+import 'package:medgis_app/view/settings/view/settings_view.dart';
 
 class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
@@ -106,38 +104,6 @@ class _SidebarState extends State<Sidebar> {
               const SizedBox(
                 height: 20,
               ),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _activeSelection = 3;
-                    context.read<MainCubit>().setState(SettingsViewState());
-                  });
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(
-                    _activeSelection == 3
-                        ? colorScheme.primary.withOpacity(0.2)
-                        : Colors.transparent,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                        width: 15,
-                        child: _activeSelection == 3
-                            ? const Icon(Icons.arrow_forward_rounded)
-                            : Container()),
-                    const SizedBox(
-                      width: 15,
-                    ),
-                    const Icon(Icons.settings_rounded),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    const Text("Settings")
-                  ],
-                ),
-              )
             ],
           ),
           Container(
@@ -148,14 +114,16 @@ class _SidebarState extends State<Sidebar> {
                 color: colorScheme.surface),
             child: IconButton(
               onPressed: () => _informationDialog(context),
-              icon: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              icon: const Row(
                 children: [
-                  Icon(
-                    Icons.auto_awesome_motion_rounded,
-                    color: colorScheme.primary,
+                  SizedBox(
+                    width: 15,
                   ),
-                  const Text("Documentation")
+                  Icon(Icons.settings_rounded),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  Text("Settings")
                 ],
               ),
             ),
@@ -173,19 +141,16 @@ class _SidebarState extends State<Sidebar> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
+            const Row(
               children: [
-                Icon(
-                  Icons.auto_awesome_motion_rounded,
-                  color: colorScheme.primary,
+                SizedBox(
+                  width: 15,
                 ),
-                const SizedBox(
-                  width: 25,
+                Icon(Icons.settings_rounded),
+                SizedBox(
+                  width: 10,
                 ),
-                Text(
-                  "Component Documentation",
-                  style: Theme.of(context).textTheme.headlineMedium,
-                )
+                Text("Settings")
               ],
             ),
             IconButton(
@@ -196,23 +161,7 @@ class _SidebarState extends State<Sidebar> {
             )
           ],
         ),
-        content: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.7,
-          height: MediaQuery.of(context).size.width * 0.7,
-          child: const SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 25,
-                ),
-                TableSection(),
-                ButtonSection(),
-                DataVisualizationSection()
-              ],
-            ),
-          ),
-        ),
+        content: const SettingsView(),
       ),
     );
   }
