@@ -8,6 +8,8 @@ class DetailPatientViewState extends MainState {}
 
 class QueueViewState extends MainState {}
 
+class SettingsViewState extends MainState {}
+
 class MainFailure extends MainState {
   final String message;
 

@@ -103,6 +103,41 @@ class _SidebarState extends State<Sidebar> {
                   ],
                 ),
               ),
+              const SizedBox(
+                height: 20,
+              ),
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _activeSelection = 3;
+                    context.read<MainCubit>().setState(SettingsViewState());
+                  });
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(
+                    _activeSelection == 3
+                        ? colorScheme.primary.withOpacity(0.2)
+                        : Colors.transparent,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                        width: 15,
+                        child: _activeSelection == 3
+                            ? const Icon(Icons.arrow_forward_rounded)
+                            : Container()),
+                    const SizedBox(
+                      width: 15,
+                    ),
+                    const Icon(Icons.settings_rounded),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    const Text("Settings")
+                  ],
+                ),
+              )
             ],
           ),
           Container(
