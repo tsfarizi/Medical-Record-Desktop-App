@@ -100,7 +100,7 @@ class _SettingsViewState extends State<SettingsView> {
                                           child: TextFormField(
                                             controller: _serverIdController,
                                             decoration: const InputDecoration(
-                                              hintText: 'Enter server id',
+                                              hintText: 'Input',
                                             ),
                                           ),
                                         ),
