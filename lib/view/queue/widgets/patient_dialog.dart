@@ -55,7 +55,7 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
             scrollDirection: Axis.horizontal,
             child: DataTable(
               showCheckboxColumn: false,
-              headingRowColor: MaterialStateColor.resolveWith(
+              headingRowColor: WidgetStateColor.resolveWith(
                   (states) => colorScheme.primaryContainer),
               columns: const [
                 DataColumn(label: Text("No")),

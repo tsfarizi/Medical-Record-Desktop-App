@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:medgis_app/page/widgets/button_section_description.dart';
+import 'package:medgis_app/view/settings/widgets/button_section_description.dart';
 
 class ButtonSection extends StatelessWidget {
   const ButtonSection({super.key});
