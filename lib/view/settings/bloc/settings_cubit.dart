@@ -50,7 +50,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         final serverId = '${segments[2]}.${segments[3]}';
         final baseUrl = '$ipAddress:2003';
         const pocketBasePath =
-            '../pocketbase_0.22.20_windows_amd64/pocketbase.exe';
+            '..\\pocketbase_0.22.20_windows_amd64\\pocketbase.exe';
 
         _pocketBaseProcess = await Process.start(
           pocketBasePath,
@@ -111,7 +111,7 @@ class SettingsCubit extends Cubit<SettingsState> {
 
       final baseUrl = '$newIpAddress:2003';
       const pocketBasePath =
-          '../pocketbase_0.22.20_windows_amd64/pocketbase.exe';
+          '..\\pocketbase_0.22.20_windows_amd64\\pocketbase.exe';
 
       _pocketBaseProcess = await Process.start(
         pocketBasePath,
@@ -149,7 +149,8 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> _startPocketBase(String ipAddress) async {
     final baseUrl = '$ipAddress:2003';
-    const pocketBasePath = '../pocketbase_0.22.20_windows_amd64/pocketbase.exe';
+    const pocketBasePath =
+        '..\\pocketbase_0.22.20_windows_amd64\\pocketbase.exe';
     _pocketBaseProcess = await Process.start(
       pocketBasePath,
       ['serve', '--http=$baseUrl'],
