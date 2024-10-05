@@ -77,14 +77,23 @@ class PatientService {
     await patientDao.deletePatient(patientId);
   }
 
-  Future<void> updatePatientBloodPressure(
-      String patientId, String bloodPressure) async {
-    await patientDao.updatePatientBloodPressure(patientId, bloodPressure);
+  Future<void> updatePatientBloodPressureNow(
+      String patientId, String bloodPressureNow) async {
+    await patientDao.updatePatientBloodPressureNow(patientId, bloodPressureNow);
+  }
+
+  Future<void> updatePatientBloodPressureFromNow(String patientId) async {
+    await patientDao.updatePatientBloodPressureFromNow(patientId);
   }
 
   Future<void> addMedicalRecordToPatient(
       String patientId, MedicalRecord record) async {
     await medicalRecordDao.insertMedicalRecord(record);
+  }
+
+  Future<void> updateMedicalRecord(
+      String patientId, MedicalRecord record) async {
+    await medicalRecordDao.updateMedicalRecord(record);
   }
 
   Future<void> printSinglePatientData(

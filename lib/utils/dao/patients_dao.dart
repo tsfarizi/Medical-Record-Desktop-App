@@ -47,10 +47,19 @@ class PatientDao {
     await pb.collection('patient').update(patient.id, body: patient.toJson());
   }
 
-  Future<void> updatePatientBloodPressure(
-      String patientId, String bloodPressure) async {
+  Future<void> updatePatientBloodPressureNow(
+      String patientId, String bloodPressureNow) async {
     await pb.collection('patient').update(patientId, body: {
-      'blood_pressure': bloodPressure,
+      'blood_pressure_now': bloodPressureNow,
+    });
+  }
+
+  Future<void> updatePatientBloodPressureFromNow(String patientId) async {
+    final record = await pb.collection('patient').getOne(patientId);
+    final bloodPressureNow = record.data['blood_pressure_now'];
+    await pb.collection('patient').update(patientId, body: {
+      'blood_pressure': bloodPressureNow,
+      'blood_pressure_now': '',
     });
   }
 

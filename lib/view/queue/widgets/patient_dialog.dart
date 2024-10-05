@@ -31,8 +31,8 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
   }
 
   Widget _buildAvailablePatientsTable(QueueSuccess state) {
-    // Perbaikan di sini
-    final queuePatientIds = state.queuePatients.map((p) => p.patientId).toSet();
+    final queuePatientIds =
+        state.queuePatients.map((p) => p.patient.id).toSet();
 
     List<PatientWithMedicalRecords> availablePatients = state.allPatients
         .where((patient) => !queuePatientIds.contains(patient.patient.id))
@@ -41,7 +41,7 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
     if (query.isNotEmpty) {
       availablePatients = availablePatients.where((patient) {
         final name = patient.patient.fullName.toLowerCase();
-        final phone = patient.patient.phone.toLowerCase();
+        final phone = (patient.patient.phone).toLowerCase();
         final regNum = patient.patient.registrationNumber.toString();
         return name.contains(query) ||
             phone.contains(query) ||
@@ -83,7 +83,7 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
                       onPressed: () {
                         context
                             .read<QueueCubit>()
-                            .addToLocalQueue(patientRecord.patient.id);
+                            .addToQueue(patientRecord.patient.id);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text("Patient added to queue")),
@@ -173,7 +173,7 @@ class _PatientDialogContentState extends State<PatientDialogContent> {
                   if (newPatient != null) {
                     context
                         .read<QueueCubit>()
-                        .addToLocalQueue(newPatient.patient.id);
+                        .addToQueue(newPatient.patient.id);
                   }
                   Navigator.of(context).pop();
                   setState(() {});

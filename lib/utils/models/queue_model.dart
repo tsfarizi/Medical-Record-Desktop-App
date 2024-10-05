@@ -1,7 +1,9 @@
+import 'package:pocketbase/pocketbase.dart';
+
 class Queue {
   final String id;
   final DateTime date;
-  final List<String> patients;
+  List<String> patients;
 
   Queue({
     required this.id,
@@ -9,12 +11,13 @@ class Queue {
     required this.patients,
   });
 
-  factory Queue.fromJson(Map<String, dynamic> json) {
+  factory Queue.fromRecord(RecordModel record) {
     return Queue(
-      id: json['id'],
-      date: DateTime.parse(json['date']),
-      patients:
-          json['patients'] != null ? List<String>.from(json['patients']) : [],
+      id: record.id,
+      date: DateTime.parse(record.data['date']),
+      patients: record.data['patients'] != null
+          ? List<String>.from(record.data['patients'])
+          : [],
     );
   }
 }

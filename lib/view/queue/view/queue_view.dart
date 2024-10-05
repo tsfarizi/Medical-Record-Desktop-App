@@ -36,7 +36,7 @@ class _QueueViewState extends State<QueueView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: const PatientDialogContent(),
+              child: PatientDialogContent(),
             ),
           ),
         );
@@ -45,20 +45,9 @@ class _QueueViewState extends State<QueueView> {
   }
 
   Widget _buildQueueTable(QueueSuccess state) {
-    final Map<String, PatientWithMedicalRecords> allPatientsMap = {
-      for (var p in state.allPatients) p.patient.id: p
-    };
+    final List<PatientWithMedicalRecords> queuePatients = state.queuePatients;
 
-    final List<Map<String, dynamic>> queueDisplayData =
-        state.queuePatients.map((queuePatient) {
-      final patientRecord = allPatientsMap[queuePatient.patientId];
-      return {
-        'patientRecord': patientRecord,
-        'queuePatient': queuePatient,
-      };
-    }).toList();
-
-    return queueDisplayData.isEmpty
+    return queuePatients.isEmpty
         ? const Center(child: Text("No patients in the queue."))
         : SingleChildScrollView(
             scrollDirection: Axis.horizontal,
@@ -71,37 +60,32 @@ class _QueueViewState extends State<QueueView> {
                 DataColumn(label: Text("Registration Number")),
                 DataColumn(label: Text("Name")),
                 DataColumn(label: Text("Phone Number")),
-                DataColumn(label: Text("Blood Pressure")),
+                DataColumn(label: Text("Blood Pressure Now")),
                 DataColumn(label: Text("Remove")),
               ],
-              rows: queueDisplayData.asMap().entries.map((entry) {
+              rows: queuePatients.asMap().entries.map((entry) {
                 int index = entry.key;
-                var data = entry.value;
-
-                PatientWithMedicalRecords? patientRecord =
-                    data['patientRecord'] as PatientWithMedicalRecords?;
-                QueuePatientData queuePatient =
-                    data['queuePatient'] as QueuePatientData;
+                PatientWithMedicalRecords patientRecord = entry.value;
 
                 return DataRow(
                   onSelectChanged: (selected) {
                     if (selected == true) {
-                      if (queuePatient.bloodPressure == null ||
-                          queuePatient.bloodPressure!.isEmpty) {
-                        _inputBloodPressure(context, queuePatient);
+                      if (patientRecord.patient.bloodPressureNow == null ||
+                          patientRecord.patient.bloodPressureNow!.isEmpty) {
+                        _inputBloodPressureNow(context, patientRecord);
                       } else {
-                        _handleMedicalRecord(context, queuePatient);
+                        _handleMedicalRecord(context, patientRecord);
                       }
                     }
                   },
                   cells: [
                     DataCell(Text((index + 1).toString())),
                     DataCell(Text(
-                        patientRecord?.patient.registrationNumber.toString() ??
-                            '')),
-                    DataCell(Text(patientRecord?.patient.fullName ?? '')),
-                    DataCell(Text(patientRecord?.patient.phone ?? '')),
-                    DataCell(Text(queuePatient.bloodPressure ?? '')),
+                        patientRecord.patient.registrationNumber.toString())),
+                    DataCell(Text(patientRecord.patient.fullName)),
+                    DataCell(Text(patientRecord.patient.phone)),
+                    DataCell(
+                        Text(patientRecord.patient.bloodPressureNow ?? '')),
                     DataCell(IconButton(
                       icon: const Icon(
                         Icons.delete_rounded,
@@ -110,7 +94,7 @@ class _QueueViewState extends State<QueueView> {
                       onPressed: () {
                         context
                             .read<QueueCubit>()
-                            .removeFromLocalQueue(queuePatient.patientId);
+                            .removeFromQueue(patientRecord.patient.id);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text("Patient removed from queue")),
@@ -124,20 +108,21 @@ class _QueueViewState extends State<QueueView> {
           );
   }
 
-  void _inputBloodPressure(
-      BuildContext context, QueuePatientData queuePatient) {
-    TextEditingController bpController = TextEditingController();
+  void _inputBloodPressureNow(
+      BuildContext context, PatientWithMedicalRecords patientRecord) {
+    TextEditingController bpController = TextEditingController(
+        text: patientRecord.patient.bloodPressureNow ?? '');
 
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Input Blood Pressure'),
+          title: const Text('Input Blood Pressure Now'),
           content: TextField(
             controller: bpController,
             keyboardType: TextInputType.text,
             decoration: const InputDecoration(
-              labelText: 'Blood Pressure',
+              labelText: 'Blood Pressure Now',
             ),
           ),
           actions: [
@@ -147,11 +132,12 @@ class _QueueViewState extends State<QueueView> {
             ),
             TextButton(
               onPressed: () {
-                context.read<QueueCubit>().updateBloodPressure(
-                      queuePatient.patientId,
+                context.read<QueueCubit>().updateBloodPressureNow(
+                      patientRecord.patient.id,
                       bpController.text,
                     );
                 Navigator.of(dialogContext).pop();
+                _handleMedicalRecord(context, patientRecord);
               },
               child: const Text('Save'),
             ),
@@ -162,54 +148,56 @@ class _QueueViewState extends State<QueueView> {
   }
 
   void _handleMedicalRecord(
-      BuildContext context, QueuePatientData queuePatient) {
+      BuildContext context, PatientWithMedicalRecords patientRecord) {
     MedicalRecord? existingRecord;
-    if (queuePatient.medicalRecords.isNotEmpty) {
-      existingRecord = queuePatient.medicalRecords.first;
+    if (patientRecord.medicalRecords.isNotEmpty) {
+      existingRecord = patientRecord.medicalRecords.first;
     }
 
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return MedicalRecordForm(
-          patientId: queuePatient.patientId,
+          patientId: patientRecord.patient.id,
           record: existingRecord,
           onRecordSaved: (therapy, anamnesa) {
-            if (existingRecord == null) {
-              context.read<QueueCubit>().setMedicalRecord(
-                    queuePatient.patientId,
-                    MedicalRecord(
-                      id: '',
-                      patientId: queuePatient.patientId,
-                      date: DateTime.now(),
-                      therapyAndDiagnosis: therapy,
-                      anamnesaAndExamination: anamnesa,
-                    ),
-                  );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Medical record added successfully')),
-              );
-            } else {
-              context.read<QueueCubit>().setMedicalRecord(
-                    queuePatient.patientId,
-                    MedicalRecord(
-                      id: existingRecord.id,
-                      patientId: existingRecord.patientId,
-                      date: existingRecord.date,
-                      therapyAndDiagnosis: therapy,
-                      anamnesaAndExamination: anamnesa,
-                    ),
-                  );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Medical record updated successfully')),
-              );
-            }
+            final newRecord = MedicalRecord(
+              id: existingRecord?.id ?? '',
+              patientId: patientRecord.patient.id,
+              date: DateTime.now(),
+              therapyAndDiagnosis: therapy,
+              anamnesaAndExamination: anamnesa,
+            );
+            context.read<QueueCubit>().setMedicalRecord(
+                  patientRecord.patient.id,
+                  newRecord,
+                );
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content: Text(existingRecord == null
+                      ? 'Medical record added successfully'
+                      : 'Medical record updated successfully')),
+            );
           },
         );
       },
     );
+  }
+
+  void _closeQueue() {
+    context.read<QueueCubit>().closeQueue().then((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Queue closed")),
+        );
+      }
+    }).catchError((e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error closing queue: $e")),
+        );
+      }
+    });
   }
 
   @override
@@ -252,25 +240,9 @@ class _QueueViewState extends State<QueueView> {
           ),
         ),
         const SizedBox(height: 20),
-        BlocBuilder<QueueCubit, QueueState>(
-          builder: (context, state) {
-            bool isQueueEmpty = true;
-            if (state is QueueSuccess) {
-              isQueueEmpty = state.queuePatients.isEmpty;
-            }
-            return ElevatedButton(
-              onPressed: isQueueEmpty
-                  ? null
-                  : () {
-                      context.read<QueueCubit>().submitQueueToDatabase();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text("Queue submitted to database")),
-                      );
-                    },
-              child: const Text("Close and Submit Queue"),
-            );
-          },
+        ElevatedButton(
+          onPressed: _closeQueue,
+          child: const Text("Close Queue"),
         ),
       ],
     );
