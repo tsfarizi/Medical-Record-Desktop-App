@@ -8,6 +8,7 @@ class Patient {
   final String phone;
   String? bloodPressure;
   String? bloodPressureNow;
+  String? medicalRecordNow;
 
   Patient(
       {required this.id,
@@ -18,7 +19,8 @@ class Patient {
       required this.birthDate,
       required this.phone,
       this.bloodPressure = '',
-      this.bloodPressureNow = ''});
+      this.bloodPressureNow = '',
+      this.medicalRecordNow = ''});
 
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
@@ -30,7 +32,8 @@ class Patient {
         birthDate: DateTime.parse(json['birth_date']),
         phone: json['phone'],
         bloodPressure: json['blood_pressure'],
-        bloodPressureNow: json['blood_pressure_now']);
+        bloodPressureNow: json['blood_pressure_now'],
+        medicalRecordNow: json['medical_record_now']);
   }
 
   Map<String, dynamic> toJson() {
@@ -42,7 +45,8 @@ class Patient {
       'birth_date': birthDate.toIso8601String(),
       'phone': phone,
       'blood_pressure': bloodPressure,
-      'blood_pressure_now': bloodPressureNow
+      'blood_pressure_now': bloodPressureNow,
+      'medical_record_now': medicalRecordNow
     };
   }
 }
