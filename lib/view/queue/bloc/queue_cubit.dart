@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:medgis_app/utils/models/patient_model.dart';
 import 'package:medgis_app/utils/models/queue_model.dart';
 import 'package:medgis_app/utils/services/patient_service.dart';
 import 'package:medgis_app/utils/dao/queue_dao.dart';
@@ -71,17 +72,23 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
-  Future<void> setMedicalRecord(String patientId, MedicalRecord record) async {
+  Future<void> setMedicalRecord(Patient patient, MedicalRecord record) async {
     emit(QueueLoading());
     try {
-      if (record.id.isNotEmpty) {
-        await patientService.updateMedicalRecord(patientId, record);
+      if (patient.medicalRecordNow!.isNotEmpty) {
+        await patientService.updateMedicalRecord(patient.id, record);
       } else {
-        await patientService.addMedicalRecordToPatient(patientId, record);
+        await patientService.addMedicalRecordToPatient(patient.id, record);
       }
       await fetchAllPatients();
     } catch (e) {
       emit(QueueFailure(e.toString()));
+    }
+  }
+
+  Future<void> deleteAllMedicalRecordNowIds(Queue queue) async {
+    for (var patient in queue.patients) {
+      await patientService.deleteMedicalRecordNow(patient);
     }
   }
 
@@ -94,6 +101,7 @@ class QueueCubit extends Cubit<QueueState> {
           await patientService.updatePatientBloodPressureFromNow(patientId);
         }
       }
+      deleteAllMedicalRecordNowIds(queue!);
       await queueDao.closeQueue();
     } catch (e) {
       emit(QueueFailure(e.toString()));
