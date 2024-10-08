@@ -114,7 +114,7 @@ class Sidebar extends StatelessWidget {
                     borderRadius: const BorderRadius.all(Radius.circular(25)),
                     color: colorScheme.surface),
                 child: IconButton(
-                  onPressed: () => _informationDialog(context),
+                  onPressed: () => _settingsDialog(context),
                   icon: const Row(
                     children: [
                       SizedBox(
@@ -136,36 +136,10 @@ class Sidebar extends StatelessWidget {
     );
   }
 
-  Future<void> _informationDialog(BuildContext context) {
+  Future<void> _settingsDialog(BuildContext context) {
     return showDialog(
       context: context,
-      builder: (BuildContext dialogContext) => AlertDialog(
-        title: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Row(
-              children: [
-                SizedBox(
-                  width: 15,
-                ),
-                Icon(Icons.settings_rounded),
-                SizedBox(
-                  width: 10,
-                ),
-                Text("Settings")
-              ],
-            ),
-            IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.close_rounded, color: Colors.red),
-            )
-          ],
-        ),
-        content: const SettingsView(),
-      ),
+      builder: (BuildContext dialogContext) => const SettingsView(),
     );
   }
 }
