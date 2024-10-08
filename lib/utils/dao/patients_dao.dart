@@ -7,75 +7,155 @@ class PatientDao {
   PatientDao(String pocketBaseUrl) : pb = PocketBase(pocketBaseUrl);
 
   Future<List<Patient>> getAllPatients() async {
-    final records = await pb.collection('patient').getFullList();
-    return records.map((record) => Patient.fromJson(record.toJson())).toList();
+    try {
+      final records = await pb
+          .collection('patient')
+          .getFullList()
+          .timeout(const Duration(seconds: 2));
+      return records
+          .map((record) => Patient.fromJson(record.toJson()))
+          .toList();
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<Patient?> getPatientById(String id) async {
-    final record = await pb.collection('patient').getOne(id);
-    return Patient.fromJson(record.toJson());
+    try {
+      final record = await pb
+          .collection('patient')
+          .getOne(id)
+          .timeout(const Duration(seconds: 2));
+      return Patient.fromJson(record.toJson());
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<List<Patient>> getPatientsByIds(List<String> ids) async {
-    if (ids.isEmpty) return [];
-    final filter = 'id IN (${ids.map((id) => "'$id'").join(',')})';
-    final records = await pb.collection('patient').getFullList(filter: filter);
-    return records.map((record) => Patient.fromJson(record.toJson())).toList();
+    try {
+      if (ids.isEmpty) return [];
+      final filter = 'id IN (${ids.map((id) => "'$id'").join(',')})';
+      final records = await pb
+          .collection('patient')
+          .getFullList(filter: filter)
+          .timeout(const Duration(seconds: 2));
+      return records
+          .map((record) => Patient.fromJson(record.toJson()))
+          .toList();
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<void> insertPatient(Patient patient) async {
-    int nextRegistrationNumber = await _getNextRegistrationNumber();
-    Map<String, dynamic> patientData = patient.toJson();
-    patientData['registration_number'] = nextRegistrationNumber;
-    await pb.collection('patient').create(body: patientData);
+    try {
+      int nextRegistrationNumber = await _getNextRegistrationNumber()
+          .timeout(const Duration(seconds: 2));
+      Map<String, dynamic> patientData = patient.toJson();
+      patientData['registration_number'] = nextRegistrationNumber;
+      await pb
+          .collection('patient')
+          .create(body: patientData)
+          .timeout(const Duration(seconds: 2));
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<int> _getNextRegistrationNumber() async {
-    final result = await pb.collection('patient').getList(
-          sort: '-registration_number',
-          perPage: 1,
-        );
-    if (result.items.isNotEmpty) {
-      int maxRegNum = result.items.first.data['registration_number'];
-      return maxRegNum + 1;
-    } else {
-      return 1;
+    try {
+      final result = await pb.collection('patient').getList(
+            sort: '-registration_number',
+            perPage: 1,
+          );
+      if (result.items.isNotEmpty) {
+        int maxRegNum = result.items.first.data['registration_number'];
+        return maxRegNum + 1;
+      } else {
+        return 1;
+      }
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     }
   }
 
   Future<void> updatePatient(Patient patient) async {
-    await pb.collection('patient').update(patient.id, body: patient.toJson());
+    try {
+      await pb
+          .collection('patient')
+          .update(patient.id, body: patient.toJson())
+          .timeout(const Duration(seconds: 2));
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<void> updatePatientBloodPressureNow(
       String patientId, String bloodPressureNow) async {
-    await pb.collection('patient').update(patientId, body: {
-      'blood_pressure_now': bloodPressureNow,
-    });
+    try {
+      await pb.collection('patient').update(patientId, body: {
+        'blood_pressure_now': bloodPressureNow,
+      }).timeout(const Duration(seconds: 2));
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<void> updatePatientBloodPressureFromNow(String patientId) async {
-    final record = await pb.collection('patient').getOne(patientId);
-    final bloodPressureNow = record.data['blood_pressure_now'];
-    await pb.collection('patient').update(patientId, body: {
-      'blood_pressure': bloodPressureNow,
-      'blood_pressure_now': '',
-    });
+    try {
+      final record = await pb
+          .collection('patient')
+          .getOne(patientId)
+          .timeout(const Duration(seconds: 2));
+      final bloodPressureNow = record.data['blood_pressure_now'];
+      await pb.collection('patient').update(patientId, body: {
+        'blood_pressure': bloodPressureNow,
+        'blood_pressure_now': '',
+      }).timeout(const Duration(seconds: 2));
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<void> insertMedicalRecordNow(String patientId, String medrecId) async {
-    await pb
-        .collection('patient')
-        .update(patientId, body: {'medical_record_now': medrecId});
+    try {
+      await pb.collection('patient').update(patientId, body: {
+        'medical_record_now': medrecId
+      }).timeout(const Duration(seconds: 2));
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<void> deleteMedicalRecordNow(String patientId) async {
-    await pb
-        .collection('patient')
-        .update(patientId, body: {'medical_record_now': ''});
+    try {
+      await pb.collection('patient').update(patientId,
+          body: {'medical_record_now': ''}).timeout(const Duration(seconds: 2));
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 
   Future<void> deletePatient(String id) async {
-    await pb.collection('patient').delete(id);
+    try {
+      await pb
+          .collection('patient')
+          .delete(id)
+          .timeout(const Duration(seconds: 2));
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+    }
   }
 }

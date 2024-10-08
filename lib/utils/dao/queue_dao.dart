@@ -11,38 +11,50 @@ class QueueDao {
     _initialize();
   }
 
-  void _initialize() async {
+  void _initialize() {
     pb.collection('queue_now').subscribe('*', (e) async {
-      final queue = await getCurrentQueue();
+      try {
+        final queue = await getCurrentQueue();
+        if (queue != null) {
+          _queueStreamController.add(queue);
+        } else {
+          _queueStreamController
+              .add(Queue(id: '', date: DateTime.now(), patients: []));
+        }
+      } catch (e) {
+        throw Exception(
+            'There is an error in the database, please make sure the server ID is correct or turn on the server.');
+      }
+    });
+
+    getCurrentQueue().then((queue) {
       if (queue != null) {
         _queueStreamController.add(queue);
       } else {
         _queueStreamController
             .add(Queue(id: '', date: DateTime.now(), patients: []));
       }
+    }).catchError((e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     });
-
-    final queue = await getCurrentQueue();
-    if (queue != null) {
-      _queueStreamController.add(queue);
-    } else {
-      _queueStreamController
-          .add(Queue(id: '', date: DateTime.now(), patients: []));
-    }
   }
 
   Stream<Queue> get queueStream => _queueStreamController.stream;
 
   Future<RecordModel?> _getCurrentQueueRecord() async {
     try {
-      final result = await pb.collection('queue_now').getList(perPage: 1);
+      final result = await pb
+          .collection('queue_now')
+          .getList(perPage: 1)
+          .timeout(const Duration(seconds: 2));
       if (result.items.isNotEmpty) {
         return result.items.first;
       }
       return null;
     } catch (e) {
-      print('Error in _getCurrentQueueRecord: $e');
-      return null;
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     }
   }
 
@@ -54,8 +66,8 @@ class QueueDao {
       }
       return null;
     } catch (e) {
-      print('Error in getCurrentQueue: $e');
-      return null;
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     }
   }
 
@@ -65,10 +77,11 @@ class QueueDao {
       final newRecord = await pb.collection('queue_now').create(body: {
         'date': todayDate,
         'patients': [],
-      });
+      }).timeout(const Duration(seconds: 2));
       _queueStreamController.add(Queue.fromRecord(newRecord));
     } catch (e) {
-      print('Error in createCurrentQueue: $e');
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     }
   }
 
@@ -84,12 +97,13 @@ class QueueDao {
           queue.patients.add(patientId);
           await pb.collection('queue_now').update(queue.id, body: {
             'patients': queue.patients,
-          });
+          }).timeout(const Duration(seconds: 2));
           _queueStreamController.add(queue);
         }
       }
     } catch (e) {
-      print('Error in addPatientToQueue: $e');
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     }
   }
 
@@ -100,12 +114,12 @@ class QueueDao {
         queue.patients.remove(patientId);
         await pb.collection('queue_now').update(queue.id, body: {
           'patients': queue.patients,
-        });
+        }).timeout(const Duration(seconds: 2));
         _queueStreamController.add(queue);
       }
     } catch (e) {
-      print('Error in removePatientFromQueue: $e');
-      rethrow;
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     }
   }
 
@@ -116,18 +130,23 @@ class QueueDao {
         await pb.collection('queue').create(body: {
           'date': queue.date.toIso8601String(),
           'patients': queue.patients,
-        });
-        final records = await pb.collection('queue_now').getFullList();
+        }).timeout(const Duration(seconds: 2));
+        final records = await pb
+            .collection('queue_now')
+            .getFullList()
+            .timeout(const Duration(seconds: 2));
         for (var record in records) {
-          await pb.collection('queue_now').delete(record.id);
+          await pb
+              .collection('queue_now')
+              .delete(record.id)
+              .timeout(const Duration(seconds: 2));
         }
         _queueStreamController
             .add(Queue(id: '', date: DateTime.now(), patients: []));
       }
-    } catch (e, stacktrace) {
-      print('Error in closeQueue: $e');
-      print('Stacktrace: $stacktrace');
-      rethrow;
+    } catch (e) {
+      throw Exception(
+          'There is an error in the database, please make sure the server ID is correct or turn on the server.');
     }
   }
 

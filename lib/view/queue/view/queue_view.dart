@@ -72,9 +72,9 @@ class _QueueViewState extends State<QueueView> {
                     if (selected == true) {
                       if (patientRecord.patient.bloodPressureNow == null ||
                           patientRecord.patient.bloodPressureNow!.isEmpty) {
-                        _inputBloodPressureNow(context, patientRecord);
+                        _inputBloodPressureNow(patientRecord);
                       } else {
-                        _handleMedicalRecord(context, patientRecord);
+                        _handleMedicalRecord(patientRecord);
                       }
                     }
                   },
@@ -108,8 +108,7 @@ class _QueueViewState extends State<QueueView> {
           );
   }
 
-  void _inputBloodPressureNow(
-      BuildContext context, PatientWithMedicalRecords patientRecord) {
+  void _inputBloodPressureNow(PatientWithMedicalRecords patientRecord) {
     TextEditingController bpController = TextEditingController(
         text: patientRecord.patient.bloodPressureNow ?? '');
 
@@ -137,7 +136,7 @@ class _QueueViewState extends State<QueueView> {
                       bpController.text,
                     );
                 Navigator.of(dialogContext).pop();
-                _handleMedicalRecord(context, patientRecord);
+                _handleMedicalRecord(patientRecord);
               },
               child: const Text('Save'),
             ),
@@ -147,14 +146,15 @@ class _QueueViewState extends State<QueueView> {
     );
   }
 
-  void _handleMedicalRecord(
-      BuildContext context, PatientWithMedicalRecords patientRecord) async {
+  void _handleMedicalRecord(PatientWithMedicalRecords patientRecord) async {
     MedicalRecord? existingRecord;
     if (patientRecord.patient.medicalRecordNow!.isNotEmpty) {
       existingRecord = await context
           .read<QueueCubit>()
           .getExistingMedicalRecord(patientRecord.patient.medicalRecordNow!);
     }
+
+    if (!mounted) return;
 
     showDialog(
       context: context,
