@@ -28,8 +28,11 @@ class MedicalRecordDao {
         .toList();
   }
 
-  Future<void> insertMedicalRecord(MedicalRecord record) async {
-    await pb.collection('medical_record').create(body: record.toJson());
+  Future<MedicalRecord> insertMedicalRecord(MedicalRecord record) async {
+    final response =
+        await pb.collection('medical_record').create(body: record.toJson());
+    final insertedRecord = MedicalRecord.fromJson(response.toJson());
+    return insertedRecord;
   }
 
   Future<void> updateMedicalRecord(MedicalRecord record) async {

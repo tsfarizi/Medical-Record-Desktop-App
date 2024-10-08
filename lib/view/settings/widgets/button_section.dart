@@ -19,56 +19,56 @@ class ButtonSection extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Sesuai dengan namanya tombol ini memiliki fungsi akan memunculkan formulir untuk menambahkan pasien baru"),
+            "As the name suggests, this button has the function of displaying a form for adding new patients."),
         const Text(""),
         Text(
           "2. Add Medical Record",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Begitu juga dengan tombol ini yang sesuai dengan teks yang tertera pada tombolnya itu sendiri, yaitu berarti tombol ini berfungsi untuk menambahkan rekam medis pada seorang pasien"),
+            "Likewise, this button corresponds to the text on the button itself, which means that this button functions to add medical records to a patient."),
         const Text(""),
         Text(
           "3. Edit Patient Data",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Ikon ini akan muncul pada bagian yang menampilkan data lengkap pasien dan data dari setiap pasiennya dapat di ubah dengan cara menekan ikon ini yang nantinya akan memberikan akses, untuk mengubah data pasien bergantung pada data apa yang di pilih."),
+            "This icon will appear in the section that displays complete patient data and data from each patient can be changed by pressing this icon which will later provide access to change patient data depending on the data selected."),
         const Text(""),
         Text(
           "4. Information Window",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Ini adalah ikon yang ketika di tekan maka akan memunculkan jendela informasi seperti tampilan saat ini, yang berisi hal - hal yang perlu di ketahui dari aplikasi ini"),
+            "This is an icon that when pressed will bring up an information window like the current display, which contains things you need to know about this application."),
         const Text(""),
         Text(
           "5. Back",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Ikon ini yang memiliki tanggung jawab untuk membuat tampilan kembali ketampilan sebelumnya"),
+            "This icon is responsible for returning the display to its previous appearance."),
         const Text(""),
         Text(
           "6. Export",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Ikon ini akan melakukan export data dari dari pasien baris tersebut ke dalam file pdf."),
+            "This icon will export the data from that row of patients into a pdf file."),
         const Text(""),
         Text(
           "7. Delete Data Patient/Medical Record",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Seperti ikon yang di gunakan, tentu ikon ini berfungsi untuk menghapus data pasien ataupun data rekam medis sesuai di mana icon ini ditekan, di tabel pasien atau di tabel rekam medis yang berada di detail setiap pasien."),
+            "Like the icon used, of course this icon functions to delete patient data or medical record data according to where this icon is pressed, in the patient table or in the medical record table which is in the details of each patient."),
         const Text(""),
         Text(
           "8. Close",
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         const Text(
-            "Ikon X merah ini memiliki fungsi yaitu unutk menutup jendela muncul(Seperti tampilan sekarang), serta memiliki fungsi untuk menutup aplikasi(pada ikon yang selalu ada di kanan atas layar)"),
+            "This red X icon has the function of closing the pop-up window (as shown now), and has the function of closing the application (on the icon that is always on the top right of the screen)."),
         const Text(""),
         const Text(""),
         const SizedBox(

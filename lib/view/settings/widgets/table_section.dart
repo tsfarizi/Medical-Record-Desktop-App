@@ -75,7 +75,7 @@ class TableSection extends StatelessWidget {
           ),
         ),
         const Text(
-            "Bagian utama ini akan menampilkan semua data yang dimiliki,ketik baris data di tekan makan akan menampilkan data secara lengkap, dan ikon tempat sampah ketika di tekan akan memunculkan jendela yang meminta konfirmasi apakah benar data baris tersebut akan di hapus."),
+            "This main section will display all the data owned, type the data row and press it, it will display the complete data, and when the trash icon is pressed, a window will appear asking for confirmation whether the row data will be deleted."),
         const Text(""),
         const Text(""),
         const SizedBox(

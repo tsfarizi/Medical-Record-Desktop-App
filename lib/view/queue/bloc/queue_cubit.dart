@@ -78,7 +78,9 @@ class QueueCubit extends Cubit<QueueState> {
       if (patient.medicalRecordNow!.isNotEmpty) {
         await patientService.updateMedicalRecord(patient.id, record);
       } else {
-        await patientService.addMedicalRecordToPatient(patient.id, record);
+        final insertedRecord =
+            await patientService.addMedicalRecordToPatient(patient.id, record);
+        await patientService.addMedicalRecordNow(patient.id, insertedRecord.id);
       }
       await fetchAllPatients();
     } catch (e) {
@@ -86,10 +88,14 @@ class QueueCubit extends Cubit<QueueState> {
     }
   }
 
-  Future<void> deleteAllMedicalRecordNowIds(Queue queue) async {
+  Future<void> deleteAllMedicalRecordNow(Queue queue) async {
     for (var patient in queue.patients) {
       await patientService.deleteMedicalRecordNow(patient);
     }
+  }
+
+  Future<MedicalRecord?> getExistingMedicalRecord(String medrecId) async {
+    return patientService.getMedicalRecordNow(medrecId);
   }
 
   Future<void> closeQueue() async {
@@ -101,7 +107,7 @@ class QueueCubit extends Cubit<QueueState> {
           await patientService.updatePatientBloodPressureFromNow(patientId);
         }
       }
-      deleteAllMedicalRecordNowIds(queue!);
+      deleteAllMedicalRecordNow(queue!);
       await queueDao.closeQueue();
     } catch (e) {
       emit(QueueFailure(e.toString()));

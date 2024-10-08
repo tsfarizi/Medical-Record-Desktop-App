@@ -63,6 +63,18 @@ class PatientDao {
     });
   }
 
+  Future<void> insertMedicalRecordNow(String patientId, String medrecId) async {
+    await pb
+        .collection('patient')
+        .update(patientId, body: {'medical_record_now': medrecId});
+  }
+
+  Future<void> deleteMedicalRecordNow(String patientId) async {
+    await pb
+        .collection('patient')
+        .update(patientId, body: {'medical_record_now': ''});
+  }
+
   Future<void> deletePatient(String id) async {
     await pb.collection('patient').delete(id);
   }

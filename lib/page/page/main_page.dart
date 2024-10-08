@@ -97,7 +97,8 @@ class MainPage extends StatelessWidget {
                           }
                         } else {
                           return const Center(
-                            child: Text('Database is off'),
+                            child: Text(
+                                'Database is off, turn it on in the settings menu at the bottom left of the screen'),
                           );
                         }
                       },

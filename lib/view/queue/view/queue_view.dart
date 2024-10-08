@@ -36,7 +36,7 @@ class _QueueViewState extends State<QueueView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: PatientDialogContent(),
+              child: const PatientDialogContent(),
             ),
           ),
         );
@@ -148,10 +148,12 @@ class _QueueViewState extends State<QueueView> {
   }
 
   void _handleMedicalRecord(
-      BuildContext context, PatientWithMedicalRecords patientRecord) {
+      BuildContext context, PatientWithMedicalRecords patientRecord) async {
     MedicalRecord? existingRecord;
-    if (patientRecord.medicalRecords.isNotEmpty) {
-      existingRecord = patientRecord.medicalRecords.first;
+    if (patientRecord.patient.medicalRecordNow!.isNotEmpty) {
+      existingRecord = await context
+          .read<QueueCubit>()
+          .getExistingMedicalRecord(patientRecord.patient.medicalRecordNow!);
     }
 
     showDialog(
@@ -169,7 +171,7 @@ class _QueueViewState extends State<QueueView> {
               anamnesaAndExamination: anamnesa,
             );
             context.read<QueueCubit>().setMedicalRecord(
-                  patientRecord.patient.id,
+                  patientRecord.patient,
                   newRecord,
                 );
             ScaffoldMessenger.of(context).showSnackBar(

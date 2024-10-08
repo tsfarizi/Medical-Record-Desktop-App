@@ -101,6 +101,31 @@ class MedicalRecordTable extends StatelessWidget {
           child: MedicalRecordForm(
             patientId: patientId,
             record: record,
+            onRecordSaved: (therapy, anamnesa) {
+              if (record == null) {
+                context.read<DetailCubit>().addMedicalRecord(
+                      patientId,
+                      therapy,
+                      anamnesa,
+                    );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Medical record added successfully'),
+                  ),
+                );
+              } else {
+                context.read<DetailCubit>().updateMedicalRecord(
+                      record.id,
+                      therapy,
+                      anamnesa,
+                    );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Medical record updated successfully'),
+                  ),
+                );
+              }
+            },
           ),
         );
       },

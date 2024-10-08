@@ -20,7 +20,7 @@ class DataVisualizationSection extends StatelessWidget {
                   totalPatients: 100, malePatients: 63, femalePatients: 37),
             )),
         const Text(
-            'Bagian yang terdaapat pada halaman utama aplikasi ini bertanggung jawab untuk menggambarkan data yang di miliki yang yaitu jumlah pasien dan juga jumlah pasien dari masing masing gender, dan bagian ini juga dapat di gunakan untuk mengambarkan data pada suatu tanggal dengan menggunakan search bar.'),
+            'The section on the main page of this application is responsible for describing the data owned, namely the number of patients and also the number of patients of each gender, and this section can also be used to describe data on a date by using the search bar.'),
         const Text(""),
         const Text(""),
         const SizedBox(
@@ -44,7 +44,7 @@ class DataVisualizationSection extends StatelessWidget {
           ),
         ),
         const Text(
-            "Komponen ini di sebut sebagai search bar yang berfungsi untuk mencari dan juga memfilter data yang di miliki. Komponen ini bisa memfilter berdasar data apa saja yang ada pada tabel, dan ketika sedang melakukan filtering komponen visualisasi data akan merespon yang menjadikan data yang di gambarkan hanyalah data dengan kriteria yang sesuai dengan karakter yang di ketikan di search bar ini.")
+            "This component is called a search bar that functions to search and also filter the data owned. This component can filter based on any data in the table, and when filtering the data visualization component will respond which makes the data depicted only data with criteria that match the characters typed in this search bar.")
       ],
     );
   }
